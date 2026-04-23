@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fellow Governance | Planejamento Completo da Plataforma</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <style>
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --primary: #0f172a; --secondary: #1e293b;
+            --accent: #fbbf24; --info: #3b82f6; --success: #10b981; --warning: #f59e0b;
+            --danger: #ef4444; --purple: #8b5cf6; --pink: #ec4899; --text: #0f172a; --muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+        section { padding: 3rem 0; border-bottom: 1px solid #e2e8f0; }
+        section:last-child { border-bottom: none; }
+        h1, h2, h3 { line-height: 1.2; margin-bottom: 1rem; }
+        h2 { font-size: 2rem; text-align: center; position: relative; margin-bottom: 2.5rem; }
+        h2::after { content: ''; display: block; width: 80px; height: 4px; background: var(--accent); margin: 0.75rem auto 0; border-radius: 2px; }
+        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .card { background: var(--card); padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid var(--info); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); }
+        .card.success { border-top-color: var(--success); }
+        .card.danger { border-top-color: var(--danger); }
+        .card.warning { border-top-color: var(--warning); }
+        .card.purple { border-top-color: var(--purple); }
+        
+        /* BOTÕES COM HOVER */
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--info); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; margin: 1rem 0.5rem 1rem 0; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+        .btn:hover { background: #1d4ed8; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(59,130,246,0.5); }
+        .btn:active { transform: translateY(-1px); }
+        .btn.success { background: var(--success); box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+        .btn.success:hover { background: #059669; box-shadow: 0 8px 20px rgba(16,185,129,0.5); }
+        .btn.warning { background: var(--warning); color: var(--primary); box-shadow: 0 2px 8px rgba(245,158,11,0.3); }
+        .btn.warning:hover { background: #d97706; box-shadow: 0 8px 20px rgba(245,158,11,0.5); }
+        .btn.purple { background: var(--purple); box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+        .btn.purple:hover { background: #7c3aed; box-shadow: 0 8px 20px rgba(139,92,246,0.5); }
+        .btn.danger { background: var(--danger); box-shadow: 0 2px 8px rgba(239,68,68,0.3); }
+        .btn.danger:hover { background: #dc2626; box-shadow: 0 8px 20px rgba(239,68,68,0.5); }
+        
+        /* BOTÕES SOCIAIS */
+        .btn-social { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #0a66c2; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; margin: 0.5rem; text-decoration: none; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(10,102,194,0.3); }
+        .btn-social.github { background: #333; }
+        .btn-social:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(10,102,194,0.5); }
+        .btn-social.github:hover { background: #24292e; box-shadow: 0 8px 20px rgba(51,51,51,0.5); }
+        
+        .panel { display: none; background: #f1f5f9; padding: 1.5rem; border-radius: 0.75rem; margin-top: 1rem; border-left: 5px solid var(--info); animation: slideDown 0.4s ease-out; }
+        .panel.active { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.5; margin: 1rem 0; }
+        .ascii { background: #f8fafc; border: 1px solid #e2e8f0; color: var(--primary); }
+        code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; color: #0f172a; }
+        .table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); background: var(--card); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: var(--primary); color: white; font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+        .b-json { background: #dbeafe; color: #1e40af; } .b-rego { background: #fef3c7; color: #92400e; } .b-zip { background: #d1fae5; color: #065f46; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
+        .tab { padding: 0.75rem 1.25rem; background: none; border: none; cursor: pointer; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .tab:hover { color: var(--info); }
+        .tab.active { color: var(--info); border-bottom-color: var(--info); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .progress-container { margin: 1rem 0; }
+        .progress-bar { width: 100%; height: 28px; background: #e2e8f0; border-radius: 14px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--info), var(--success)); width: 0%; transition: width 0.4s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem; }
+        .sim-output { background: var(--primary); color: #e2e8f0; padding: 1.25rem; border-radius: 0.5rem; white-space: pre-wrap; max-height: 450px; overflow-y: auto; margin-top: 1rem; font-family: monospace; line-height: 1.5; }
+        
+        /* BANNER TOPO */
+        .planning-banner { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 1rem; text-align: center; font-weight: 700; position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 12px rgba(15,23,42,0.4); }
+        .planning-banner span { display: block; font-size: 0.9rem; font-weight: 400; margin-top: 0.25rem; opacity: 0.9; }
+        
+        /* HERO - NOME COM EFEITO TECNOLÓGICO BRILHANTE */
+        .hero { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 4rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: -50%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent) 0%, transparent 70%); opacity: 0.1; animation: pulse 4s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.1; } 50% { transform: scale(1.1); opacity: 0.2; } }
+        
+        /* EFEITO TECNOLÓGICO PARA "Fellow Governance" */
+        .hero h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 1rem; 
+            position: relative; 
+            z-index: 1;
+            font-family: 'Segoe UI', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--accent), #fff, var(--info), #fff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: techGlow 3s linear infinite, textShine 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 10px rgba(251,191,36,0.5), 0 0 20px rgba(59,130,246,0.3);
+        }
+        
+        @keyframes techGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes textShine {
+            from { 
+                text-shadow: 0 0 10px rgba(251,191,36,0.5), 0 0 20px rgba(59,130,246,0.3), 0 0 30px rgba(139,92,246,0.2); 
+            }
+            to { 
+                text-shadow: 0 0 20px rgba(251,191,36,0.8), 0 0 40px rgba(59,130,246,0.6), 0 0 60px rgba(139,92,246,0.4), 0 0 80px rgba(251,191,36,0.3); 
+            }
+        }
+        
+        .hero h1 .accent-letter {
+            color: var(--accent);
+            display: inline-block;
+            animation: letterPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes letterPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.05); }
+        }
+        
+        .mission-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 2px solid var(--accent); border-radius: 1rem; padding: 2rem; max-width: 1000px; margin: 2rem auto; }
+        .user-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .user-card { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid var(--accent); }
+        
+        /* BADGE HANDS-ON */
+        .hands-on-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, var(--success), #059669); color: white; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; font-size: 0.9rem; margin: 1rem auto; box-shadow: 0 4px 12px rgba(16,185,129,0.4); animation: pulse-badge 3s ease-in-out infinite; }
+        @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
+        
+        /* LINKS SOCIAIS NO HERO */
+        .social-links { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        
+        @media(max-width: 768px) { 
+            .grid { grid-template-columns: 1fr; } 
+            .hero h1 { font-size: 1.8rem; } 
+            .tabs { flex-direction: column; gap: 0.25rem; }
+            .tab { border-bottom: none; border-left: 3px solid transparent; padding-left: 0.75rem; }
+            .tab.active { border-left-color: var(--info); }
+        }
+    </style>
+</head>
+<body>
+    <!-- BANNER TOPO -->
+    <div class="planning-banner">📋 PLANEJAMENTO TÉCNICO COMPLETO - FELLOW GOVERNANCE <span>Documento 1:1 com Planing_2.md | Versionado no Git | Pronto para Recrutadores/Stakeholders</span></div>
+
+    <section class="hero">
+        <div class="container">
+            <!-- NOME COM EFEITO TECNOLÓGICO BRILHANTE -->
+            <h1>Fellow<span class="accent-letter"> </span>Governance</h1>
+            <p style="opacity:0.9; max-width:800px; margin:0 auto;">Plataforma SaaS de Governança de IA e Defesa Adversarial</p>
+            
+            <!-- BADGE HANDS-ON -->
+            <div class="hands-on-badge">🎓 Projeto de Aprendizado Hands-On | Construído para Portfolio</div>
+            
+            <!-- BOTÕES SOCIAIS -->
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/fabio-everton-3b62b1129/" target="_blank" class="btn-social">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                </a>
+                <a href="https://github.com/FABIOEVERTON/Fellow_Reg" target="_blank" class="btn-social github">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub (Recrutadores)
+                </a>
+            </div>
+            
+            <div class="mission-box">
+                <h2 style="color:var(--accent); margin-bottom:0.5rem; text-align:left;">🎯 Missão e Público-Alvo</h2>
+                <p style="font-size:1.1rem; margin-bottom:1.5rem;"><strong>Auxiliar governance-AI leaders e advogados</strong> que precisam responder a autuações por descumprimento de frameworks de IA (NIST, EU AI Act, PL 2338/2023, LGPD), traduzindo requisitos técnicos em evidências jurídicas e políticas executáveis.</p>
+                <div class="user-cards">
+                    <div class="user-card"><h3 style="color:var(--accent)">⚖️ Advogados</h3><p>Direito Digital → Modo Defesa Adversarial (≤5 min)</p></div>
+                    <div class="user-card"><h3 style="color:var(--accent)">🛡️ Governance AI Leaders</h3><p>DPO, AI Officers → Modo Diagnóstico/Compilação</p></div>
+                    <div class="user-card"><h3 style="color:var(--accent)">📋 Auditores</h3><p>Órgãos de controle → Trilhas imutáveis e relatórios forenses</p></div>
+                    <div class="user-card"><h3 style="color:var(--accent)">💻 TI/Segurança</h3><p>Implantação de bundles Rego e monitoramento</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="git">
+        <div class="container">
+            <h2>📁 Estrutura de Pastas no Git</h2>
+            <div class="card">
+                <pre>fellow-governance/
+├── backend/app/
+│   ├── api/v1/ (diagnostic.py, defense.py, policies.py)
+│   ├── agents/ (base_agent.py, rga_agents.py, agcp_agents.py, defense_agents.py)
+│   ├── sek/ (global_event_bus.py, scheduler.py, state_engine.py, policy_gate.py)
+│   ├── orchestrators/ (qilis.py, pbsai.py, defense.py)
+│   ├── models/ (tenant, user, document, audit_trail, kb_state...)
+│   ├── schemas/ & services/ (opa, gpg, vector)
+├── frontend/ (app/, components/, stores/, lib/)
+├── policies/ (msb21_baseline.rego, nist_ai_rmf.rego, pl2338.rego, lgpd.rego)
+├── infrastructure/ (docker-compose.yml, k8s/, terraform/)
+├── docs/ (ARCHITECTURE.md, AGENTS.md, API.md, DEPLOYMENT.md)
+├── .gitignore | README.md | PLANNING.md</pre>
+                <p><strong>🔍 O que o recrutador verá:</strong> Commits semânticos, branches `main/develop/feature/*`, PRs com descrição/testes, CI/CD via GitHub Actions, estrutura profissional de monorepo Python/TS.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem-solution">
+        <div class="container">
+            <h2>⚡ O Grande Problema que a Fellow Governance Resolve</h2>
+            <div class="grid">
+                <div class="card danger">
+                    <h3>🚨 Cenário Atual (Sem Fellow Governance)</h3>
+                    <p>CEO/ML quer lançar rápido. Governance AI é "voz solitária" sem dados concretos ou poder de veto. Modelo vai ao ar sem AIBOM, provenance ou drift monitoring. Autuação ANPD → Multa R$2M+ → Demissão. Ciclo se repete.</p>
+                </div>
+                <div class="card success">
+                    <h3>✅ Cenário com Fellow Governance</h3>
+                    <p>OPA Gatekeeper bloqueia deploy se MSB-21 falhar. Audit trail imutável registra tentativas de bypass. Governance AI apresenta scores, gaps e políticas Rego → CEO alinha com risco real → Compliance implementado antes da autuação.</p>
+                </div>
+            </div>
+            <button class="btn danger" onclick="simProblem()">▶ Simular Cenário Completo (CEO vs Governança)</button>
+            <div id="panel-problem" class="panel">
+                <div class="sim-output" id="out-problem">Aguardando simulação...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture">
+        <div class="container">
+            <h2>🏗️ Arquitetura de Sistema</h2>
+            <div class="tabs" id="arch-tabs">
+                <button class="tab active" onclick="switchArchTab('tab1')">Visão Geral</button>
+                <button class="tab" onclick="switchArchTab('tab2')">Frontend</button>
+                <button class="tab" onclick="switchArchTab('tab3')">Backend + SEK</button>
+                <button class="tab" onclick="switchArchTab('tab4')">Banco de Dados</button>
+            </div>
+            <div id="arch-tab1" class="tab-content active">
+                <pre class="ascii">┌─────────────────────────────────────────────────────────────┐
+│                     FELLOW GOVERNANCE                        │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                    FRONTEND (Next.js 14)                ││
+│  │  ChatInterface ↔ PolicyViewer ↔ EvidenceGraph ↔ Defense││
+│  └───────────────────────────┬─────────────────────────────┘│
+│                              │ HTTPS / WebSocket            │
+│  ┌───────────────────────────▼─────────────────────────────┐│
+│  │                    BACKEND (FastAPI)                    ││
+│  │  ┌─────────────────────────────────────────────────┐    ││
+│  │  │         SYSTEM EXECUTION KERNEL (SEK)          │    ││
+│  │  │  EventBus → Scheduler → StateEngine → PolicyGate│   ││
+│  │  │  ↕ QILIS Orchestrator ↕ PBSAI Controller ↕ Def │    ││
+│  │  └─────────────────────────────────────────────────┘    ││
+│  │  22 AGENTES (A01–A18 + D01–D04)                         ││
+│  └───────────────────────────┬─────────────────────────────┘│
+│                              │                               │
+│  ┌───────────────────────────▼─────────────────────────────┐│
+│  │         INFRA: PostgreSQL+pgvector │ Redis │ OPA       ││
+│  └─────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────┘</pre>
+            </div>
+            <div id="arch-tab2" class="tab-content">
+                <p>Next.js 14 App Router. Estado com Zustand + React Query. WebSocket `/ws/pipeline/{run_id}`. Componentes: `PipelineStatus`, `PolicyViewer`, `EvidenceGraph`, `KB_Inspector`, `QILIS_Dashboard`, `DefenseResults`.</p>
+            </div>
+            <div id="arch-tab3" class="tab-content">
+                <p>FastAPI + agentscope. SEK orquestra agentes via `BaseAgent → reaction(payload) → Pydantic output`. GlobalEventBus com hash-dedup, DeterministicScheduler, StateTransitionEngine, MemoryController, PolicyGate (OPA timeout 2s), ReplayEngine.</p>
+            </div>
+            <div id="arch-tab4" class="tab-content">
+                <pre class="ascii">tenants (1)──N users, documents, agent_runs
+agent_runs (1)──N policies, opa_decisions
+audit_trails: prev_hash encadeado (SHA-256, append-only)
+kb_state: pgvector relevance vectors (AMSE)
+defense_runs: independente, linkado a tenants & audit</pre>
+            </div>
+        </div>
+    </section>
+
+    <section id="agents">
+        <div class="container">
+            <h2>🤖 Os 22 Agentes e Matriz de I/O</h2>
+            <div class="grid" id="agent-grid"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Agente</th><th>Nome</th><th>Entrada</th><th>Saída</th><th>Formato</th></tr></thead>
+                    <tbody id="agent-table-body"></tbody>
+                </table>
+            </div>
+            <button class="btn success" onclick="simAgents()">▶ Simular Fluxo de Agentes (DAG)</button>
+            <div id="panel-agents" class="panel">
+                <div class="sim-output" id="out-agents">Clique para iniciar...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="lawyer">
+        <div class="container">
+            <h2>⚖️ Como Auxilia o Advogado (Defesa Adversarial)</h2>
+            <div class="card">
+                <h3>Fluxo: Autuação → Defesa em ≤300s</h3>
+                <p><strong>1️⃣ Upload:</strong> Auto de infração, relatório do modelo, CSV treino.<br>
+                <strong>2️⃣ Análise (D01-D04):</strong> Extrai entidades, mapeia gaps MSB-21 vs NIST/PL2338, calcula drift QILIS, gera policy regressiva.<br>
+                <strong>3️⃣ Entrega:</strong> Furos detectados, defesa em 3 linhas, ZIP forense assinado GPG.</p>
+            </div>
+            <button class="btn warning" onclick="simLawyer()">▶ Simular Caso Real de Autuação</button>
+            <div id="panel-lawyer" class="panel">
+                <div class="sim-output" id="out-lawyer">Aguardando simulação...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="governance">
+        <div class="container">
+            <h2>🛡️ Como auxilia o Governance AI lead no Primeiro Dia</h2>
+            <div class="card">
+                <h3>Dashboard de Onboarding (Governance AI Lead)</h3>
+                <p>Ao logar, vê: 15 modelos, 8 com risco ALTO, 12 sem AIBOM, 5 com drift >0.15. Políticas Rego internas já aplicadas. Botão "Bloquear Deploy" tem poder real via OPA. Audit trail registra todas as ações com hash chain.</p>
+                <div class="progress-container">
+                    <div class="progress-label"><span>MSB-21 Compliance Geral</span><span>40%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:40%">40%</div></div>
+                </div>
+                <pre>package ceis.internal
+default allow_deploy = false
+allow_deploy { input.has_aibom == true }
+allow_deploy { input.qilis_drift < 0.15 }</pre>
+            </div>
+            <button class="btn purple" onclick="simGovernance()">▶ Simular Primeiro Dia</button>
+            <div id="panel-gov" class="panel">
+                <div class="sim-output" id="out-gov">Aguardando simulação...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pipeline">
+        <div class="container">
+            <h2>🔄 Pipeline Runtime (6 Passos Determinísticos)</h2>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); text-align: center; gap: 0.5rem;">
+                <div class="card" style="padding:0.75rem">1️⃣ Upload</div>
+                <div class="card" style="padding:0.75rem">2️⃣ Ingestão (A13)</div>
+                <div class="card" style="padding:0.75rem">3️⃣ Estruturação (A10+QILIS)</div>
+                <div class="card" style="padding:0.75rem">4️⃣ Análise Paralela</div>
+                <div class="card" style="padding:0.75rem">5️⃣ Compilação (A17→A18→A12)</div>
+                <div class="card" style="padding:0.75rem">6️⃣ Auditoria (A08→A09)</div>
+            </div>
+            <button class="btn" onclick="simPipeline()">▶ Executar Pipeline Completo</button>
+            <div id="panel-pipe" class="panel">
+                <div class="progress-container"><div class="progress-bar"><div class="progress-fill" id="pipe-bar">0%</div></div></div>
+                <div class="sim-output" id="out-pipe">Pronto para executar...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stack">
+        <div class="container">
+            <h2>🛠️ Stack Tecnológico Completo</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Backend</h3>
+                    <ul><li>Python 3.11 + FastAPI 0.104+</li><li>agentscope 0.5+ (orquestração) <a href="https://github.com/modelscope/agentscope" target="_blank" style="color:var(--info); text-decoration:none;">🔗</a></li><li>PostgreSQL 14+pgvector, Redis 7</li><li>OPA 0.58, Celery 5.3, Pydantic 2.0</li><li>spaCy 3.7, sentence-transformers 2.2</li><li>python-gnupg 0.5, Alembic 1.12</li></ul>
+                </div>
+                <div class="card success">
+                    <h3>Frontend</h3>
+                    <ul><li>Next.js 14 + React 18 + TS 5.0</li><li>Tailwind CSS 3.3, Zustand 4.4</li><li>React Query 5.0, Chart.js 4.4</li><li>react-flow 11.8, socket.io-client 4.5</li></ul>
+                </div>
+                <div class="card warning">
+                    <h3>Infra</h3>
+                    <ul><li>Docker 24+, Kubernetes 1.27, Helm 3.12</li><li>GitHub Actions, Terraform 1.5</li><li>Prometheus 2.45, Grafana 10.0, Loki 2.9</li><li>AWS/GCP hospedagem</li></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="timeline">
+        <div class="container">
+            <h2>📅 Cronograma de Construção (90 Dias | ~250h)</h2>
+            
+            <!-- CRONOGRAMA EM BLOCO ÚNICO MARKDOWN -->
+            <div class="card">
+                <pre class="ascii">## 📅 Cronograma de Construção - Fellow Governance (90 Dias | ~250h)
+
+### Visão Semanal (12 Semanas)
+| Semana | Dias | Tema | Entregáveis Principais |
+|--------|------|------|----------------------|
+| **1** | 1-7 | Fundação | Ambiente Docker, Git init, FastAPI setup, Next.js scaffold, poetry/pnpm config |
+| **2** | 8-14 | Banco + Auth | PostgreSQL + pgvector, JWT login/refresh, RBAC middleware, migrations iniciais |
+| **3** | 15-21 | agentscope + SEK | BaseAgent, GlobalEventBus, DeterministicScheduler, StateTransitionEngine, PolicyGate |
+| **4** | 22-28 | Agentes A01-A03 | Monitor Legislativo, Simulador Impacto, Validação Dados (Pydantic I/O) |
+| **5** | 29-35 | Agentes A04-A08 | Demandas Inteligência, Motor de Risco, Reconciliador, Gov IA Classifier, Auditor QILIS |
+| **6** | 36-42 | Agentes A09-A14 | Output Generator, Auditoria Estrutural, Conhecimento Externo, Gatekeeper OPA, Integrador Universal, Dados Públicos |
+| **7** | 43-49 | A15-A18 + QILIS | Curador Insights, Shadow AI Detector, Policy-as-Code YAML, Compiler Rego + AMSE/RBCO/KB/IOG |
+| **8** | 50-56 | PBSAI | MSB-21 validator (21 controles), 12 domínios, evidence graph, PQC integration |
+| **9** | 57-63 | AGCP + SEK | Vocabulary enforcement, canonical_state_qualification, admissible_set_adjudication, FVL |
+| **10** | 64-71 | Defesa D01-D04 | Analisador Adversarial, Gap Finder, QILIS Evidence, Rego Regressivo + timer 300s |
+| **11** | 72-82 | Frontend | ChatInterface, PolicyViewer, EvidenceGraph, KB_Inspector, QILIS_Dashboard, DefenseInterface |
+| **12** | 83-90 | Testes + CI/CD + Docs | pytest, Playwright, GitHub Actions, Helm charts, documentação completa, smoke tests |
+
+### Detalhamento Dia a Dia (Resumo Operacional)
+| Dia | Tarefa | Tempo | Status |
+|-----|--------|-------|--------|
+| 1 | Instalar Python 3.11, Node.js 18, Docker, Git, VS Code | 2h | ✅ |
+| 2 | Criar repositório, .gitignore, branches main/develop | 1h | ✅ |
+| 3 | poetry init + dependências FastAPI/Pydantic/SQLAlchemy | 2h | ✅ |
+| 4 | pnpm create next-app + testar dev server | 1h | ✅ |
+| 5 | docker-compose: postgres, redis, pgadmin | 2h | ✅ |
+| 6 | Estrutura backend: app/, models/, api/, agents/ | 1h | ✅ |
+| 7 | Endpoint /health, CORS, integração teste | 2h | ✅ |
+| 8 | Model Tenant + migration Alembic | 2h | ✅ |
+| 9 | Model User + migration + seed admin | 2h | ✅ |
+| 10 | JWT login, refresh, get_current_user | 3h | ✅ |
+| 11 | Refresh token + blacklist Redis | 2h | ✅ |
+| 12 | Middleware RBAC + decorator @require_role | 2h | ✅ |
+| 13 | Models Document, AgentRun + migrations | 2h | ✅ |
+| 14 | Models Policy, OPADecision, AuditTrail + migrations | 3h | ✅ |
+| 15 | Instalar agentscope, criar BaseAgent abstrato | 2h | ✅ |
+| 16 | Criar estrutura agentscope/ceis/ | 1h | ✅ |
+| 17 | GlobalEventBus com hash-dedup | 3h | ✅ |
+| 18 | DeterministicScheduler com lockstep | 3h | ✅ |
+| 19 | StateTransitionEngine + canonical_state | 3h | ✅ |
+| 20 | MemoryController (Redis + DB sync) | 2h | ✅ |
+| 21 | PolicyGate (integração OPA client) | 3h | ✅ |
+| 22-28 | A01, A02, A03 (7 dias) | 21h | ✅ |
+| 29-35 | A04, A05, A06, A07, A08 (7 dias) | 21h | ✅ |
+| 36-42 | A09-A14 (6 agentes, 7 dias) | 21h | ✅ |
+| 43-49 | A15-A18 + QILIS AMSE/RBCO/KB/IOG | 28h | ✅ |
+| 50-56 | PBSAI: MSB-21, 12 domínios, evidence graph | 28h | ✅ |
+| 57-63 | AGCP: vocabulary, canonical state, admissible set | 21h | ✅ |
+| 64-71 | D01-D04 + DefenseOrchestrator timer 300s | 24h | ✅ |
+| 72-82 | Frontend: 11 dias de componentes React/TS | 33h | ✅ |
+| 83-90 | Testes, CI/CD, documentação, smoke tests | 24h | ✅ |
+
+**Total estimado: ~250 horas** | **Entregas semanais com PRs documentados e CI/CD**</pre>
+            </div>
+            
+            <!-- BOTÃO PARA VER DETALHAMENTO (mantido funcional) -->
+            <button class="btn" onclick="showTimeline()">▶ Ver Detalhamento Dia a Dia (Expandido)</button>
+            <div id="panel-timeline" class="panel">
+                <div class="sim-output" id="out-timeline">Carregando...</div>
+            </div>
+            
+            <!-- NOVA SEÇÃO: CURSOS E CERTIFICAÇÕES -->
+            <div class="card" style="margin-top:2rem; border-top-color:var(--warning);">
+                <h3>🎓 Cursos e Certificações Recomendadas</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome / Tema</th>
+                                <th>Plataforma / Fonte</th>
+                                <th>Tipo de acesso</th>
+                                <th>Carga / observação</th>
+                                <th>Por que vale a pena (resumo)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>OPA Policy Authoring (Rego)</strong></td>
+                                <td>Styra Academy – academy.styra.com</td>
+                                <td>Gratuito + certificado</td>
+                                <td>Curso introdutório a Rego e policy-as-code com certificado emitido pela Styra.</td>
+                                <td>Mostra domínio de OPA em nível de código de políticas.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>OPA for K8s Admission Control</strong></td>
+                                <td>Styra Academy – academy.styra.com</td>
+                                <td>Gratuito + certificado</td>
+                                <td>Curso focado em uso de OPA com controle de admissão no Kubernetes.</td>
+                                <td>Demonstração prática em segurança de clusters.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Govern AI-ready Infrastructure</strong></td>
+                                <td>Microsoft Learn – learn.microsoft.com</td>
+                                <td>Gratuito</td>
+                                <td>Path sobre governança de infraestrutura de IA no Azure.</td>
+                                <td>Alinha bem com IA governada em órgãos e setor público.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Responsible AI Principles</strong></td>
+                                <td>Microsoft Learn</td>
+                                <td>Gratuito</td>
+                                <td>Módulo de princípios de IA responsável. Em alguns casos, com código de conquista.</td>
+                                <td>Boa base ética e de governança para IA.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Governance for Responsible Innovation</strong></td>
+                                <td>edX (ex.: University of Edinburgh)</td>
+                                <td>Audit free (conteúdo grátis)</td>
+                                <td>Curso de ~8 semanas, conteúdo gratuito; certificado pago (~50–100 USD).</td>
+                                <td>Boa para quem quer governança de IA em nível internacional.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Introduction to Cloud Infrastructure</strong></td>
+                                <td>Linux Foundation – training.linuxfoundation.org</td>
+                                <td>Gratuito</td>
+                                <td>Curso introdutório em Linux, cloud e infraestrutura open source.</td>
+                                <td>Base sólida para certificações de cloud e DevOps.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LFCA Free Resources (Cloud/DevOps)</strong></td>
+                                <td>Linux Foundation</td>
+                                <td>Conteúdo gratuito</td>
+                                <td>Recursos gratuitos que preparam para certificação LFCA.</td>
+                                <td>Bom para quem quer mostrar base em infra open source.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Governança de Dados</strong></td>
+                                <td>ENAP – Escola Virtual Gov</td>
+                                <td>Gratuito</td>
+                                <td>Curso de 30h, certificado ENAP voltado a servidores públicos.</td>
+                                <td>Base sólida em governança de dados no setor público.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LGPD: Fundamentos</strong></td>
+                                <td>ENAP – Escola Virtual Gov</td>
+                                <td>Gratuito</td>
+                                <td>Curso de 20h (ou similar) sobre LGPD e proteção de dados.</td>
+                                <td>Fortalece compliance e abre portas para órgãos.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Engenharia de Prompt para Servidores</strong></td>
+                                <td>ENAP – Escola Virtual Gov</td>
+                                <td>Gratuito</td>
+                                <td>Curso de 2h em prompt-engineering para servidores.</td>
+                                <td>Mostra domínio prático de IA no contexto público.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Transformação Digital – Fundamentos</strong></td>
+                                <td>ENAP – Escola Virtual Gov</td>
+                                <td>Gratuito</td>
+                                <td>Programa de módulos com carga aproximada em torno de 100–120h.</td>
+                                <td>Boa visão estratégica para vendas B2G e consultoria.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Introdução à Ciência de Dados (FGV)</strong></td>
+                                <td>FGV Educação Executiva – educacao-executiva.fgv.br</td>
+                                <td>Provavelmente pago</td>
+                                <td>Curso curto/introdutório em ciência/análise de dados (carga varia por turma).</td>
+                                <td>Base para quem quer atuar em dados e IA; credibilidade da FGV.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proteção de Dados (FGV)</strong></td>
+                                <td>FGV Educação Executiva</td>
+                                <td>Pago</td>
+                                <td>Curso de 5h em proteção de dados.</td>
+                                <td>Reforça perfil compliance, mas não é gratuito.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="outputs">
+        <div class="container">
+            <h2>📦 Outputs e Exemplos Reais</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="switchOutTab('out1')">Diagnóstico</button>
+                <button class="tab" onclick="switchOutTab('out2')">Defesa (D01-D04)</button>
+                <button class="tab" onclick="switchOutTab('out3')">ZIP Forense</button>
+                <button class="tab" onclick="switchOutTab('out4')">Policy Rego</button>
+            </div>
+            <div id="out-out1" class="tab-content active">
+                <pre>{
+ "agent": "A01",
+ "output": { "legislative_changes": [{ "article": "PL 2338/2023 Art. 27-A", "impact": 0.87 }] },
+ "qilis_relevance_vector": [0.92, 0.78, 0.88, 0.65]
+}</pre>
+            </div>
+            <div id="out-out2" class="tab-content">
+                <pre>{
+ "run_id": "def-2026-04-18-001",
+ "execution_time_ms": 287000,
+ "furos_detectados": [{ "control_id": "MSB-21 #2", "confidence": 0.94 }],
+ "defesa_proposta": { "linha1": "Ausência artefatos mínimos...", "linha2": "Falta hermetic builds...", "linha3": "QILIS prova ausência causalidade..." }
+}</pre>
+            </div>
+            <div id="out-out3" class="tab-content">
+                <pre>ZIP: forensic_2026-04-18-001.zip
+├── manifest.json (run_id, tenant_id, timestamp)
+├── diagnosis.json
+├── policies/ (policy_v1.rego, policy_v1.yaml)
+├── qilis_relevance_summary.json
+├── pbsai_control_sheet.json
+├── audit_chain.json (SHA-256 encadeado)
+└── signature.sha256 (GPG assinado)</pre>
+            </div>
+            <div id="out-out4" class="tab-content">
+                <pre>package ceis.policy
+default allow = false
+allow {
+  input.risk_score.fiscal < 0.7
+  input.risk_score.legal < 0.7
+  input.document_has_aibom == true
+  input.qilis_drift < 0.15
+}
+deny_reason["MSB-21 #2 violation"] { not input.document_has_aibom }</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: ESPECIFICAÇÃO TÉCNICA COMPLETA (mantida) -->
+    <section id="specs">
+        <div class="container">
+            <h2>🔍 Especificação Técnica Completa</h2>
+            <p style="text-align:center; margin-bottom:2rem; color:var(--muted);">Detalhes omitidos anteriormente, agora 100% visíveis para recrutadores técnicos</p>
+            
+            <div class="tabs" id="spec-tabs">
+                <button class="tab active" onclick="switchSpecTab('c4')">📐 Diagramas C4</button>
+                <button class="tab" onclick="switchSpecTab('db')">🗄️ Schema Banco</button>
+                <button class="tab" onclick="switchSpecTab('invariants')">🔐 6 Invariantes</button>
+                <button class="tab" onclick="switchSpecTab('agcp')">⚙️ Workflows AGCP</button>
+                <button class="tab" onclick="switchSpecTab('deps')">📦 Dependências</button>
+                <button class="tab" onclick="switchSpecTab('prompts')">🤖 Prompts IA</button>
+                <button class="tab" onclick="switchSpecTab('qilis')">🔬 QILIS/PBSAI</button>
+            </div>
+            
+            <!-- C4 DIAGRAMS -->
+            <div id="spec-c4" class="tab-content active">
+                <div class="card">
+                    <h3>Diagrama de Componentes (C4 Level 2)</h3>
+                    <pre class="ascii">┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                               SedeReg - Container Diagram                             │
+│                                                                                      │
+│  ┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐         │
+│  │   Single Page   │        │    API Gateway  │        │   PostgreSQL    │         │
+│  │   Application    │───────▶│    (FastAPI)    │───────▶│   + pgvector    │         │
+│  │   (Next.js)     │◀───────│                 │◀───────│                 │         │
+│  └─────────────────┘         └────────┬────────┘        └─────────────────┘         │
+│         │                             │                                             │
+│         │                              │                                             │
+│         ▼                             ▼                                             │
+│  ┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐         │
+│  │   WebSocket     │        │      Redis      │        │      OPA        │         │
+│  │   Connection    │───────▶│   (Cache/Queue) │        │   (Policy       │         │
+│  │                 │◀───────│                 │        │    Engine)      │         │
+│  └─────────────────┘        └─────────────────┘        └─────────────────┘         │
+│                                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐│
+│  │                              System Execution Kernel (SEK)                      ││
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐           ││
+│  │  │ Event Bus    │ │ Scheduler    │ │ State Engine │ │ Policy Gate  │           ││
+│  │  └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘           ││
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐           ││
+│  │  │ QILIS        │ │ PBSAI        │ │ Defense      │ │ Replay        │           ││
+│  │  │ Orchestrator │ │ Controller   │ │ Orchestrator │ │ Engine       │           ││
+│  │  └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘            ││
+│  └─────────────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────────────┘</pre>
+                    <p><strong>Por que importa:</strong> Mostra profundidade de modelagem arquitetural, separação clara de responsabilidades e padrões enterprise.</p>
+                </div>
+            </div>
+            
+            <!-- DATABASE SCHEMA -->
+            <div id="spec-db" class="tab-content">
+                <div class="card">
+                    <h3>Esquema Completo do Banco (13 tabelas)</h3>
+                    <pre class="ascii">┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                    ESQUEMA DE BANCO DE DADOS (PostgreSQL 14+pgvector)               │
+│                                                                                       │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
+│  │  tenants     │────▶│   users     │     │  documents  │     │ agent_runs  │        │
+│  │  ───────────│     │  ───────────│     │  ───────────│     │  ───────────│        │
+│  │  id (PK)    │      │  id (PK)    │     │  id (PK)    │     │  id (PK)    │        │
+│  │  name       │     │  tenant_id  │     │  tenant_id  │     │  run_id     │        │
+│  │  plan       │     │   role       │     │  hash_sha256 │     │  agent_name │        │
+│  │  status     │     │  email      │     │  mime_type   │     │  status     │        │
+│  └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘        │
+│         │                   │                   │                   │              │
+│         ▼                   ▼                   ▼                   ▼              │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
+│  │  policies   │     │opa_decisions│     │audit_trails │     │  kb_state   │        │
+│  │  ───────────│     │  ───────────│      │  ───────────│     │  ───────────│        │
+│  │  id (PK)    │     │  id (PK)    │     │  id (PK)    │     │  id (PK)    │        │
+│  │  run_id     │     │  policy_id  │     │   run_id     │     │  layer_id   │        │
+│  │  rego_text  │     │  result     │     │  prev_hash  │     │  relevance  │        │
+│  │  sha256     │     │  binding_   │     │  payload_   │     │  vector     │        │
+│  │  deployed   │     │  token      │     │  hash       │     │  (pgvector) │        │
+│  └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘        │
+│                                                                                      │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐                           │
+│  │msb21_attest │     │pbsai_evid_  │     │defense_runs │                           │
+│  │  ───────────│     │graph        │     │  ───────────│                            │
+│  │  id (PK)    │     │  id (PK)    │     │  id (PK)    │                           │
+│  │  artifact_id│     │  node_type  │     │  run_id     │                            │
+│  │  signature  │     │  edge_type  │     │  case_text  │                           │
+│  │  baseline_  │     │  trace_id   │     │  gaps_json  │                            │
+│  │  status     │     │             │     │  rego_policy│                           │
+│  └─────────────┘     └─────────────┘     └─────────────┘                            │
+│                                                                                      │
+│  RELACIONAMENTOS:                                                                    │
+│  • tenants 1──N users, documents, agent_runs                                       │
+│  • agent_runs 1──N policies, opa_decisions                                         │
+│  • audit_trails encadeado via prev_hash (append-only, SHA-256)                     │
+│  • kb_state referenciado por agent_runs e audit_trails (pgvector)                  │
+│  • defense_runs independente, linkado a tenants e audit_trails                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘</pre>
+                    <p><strong>Por que importa:</strong> Demonstra domínio de modelagem de dados, segurança por design (hash chain) e escalabilidade com pgvector.</p>
+                </div>
+            </div>
+            
+            <!-- 6 INVARIANTS -->
+            <div id="spec-invariants" class="tab-content">
+                <div class="card">
+                    <h3>6 Invariantes Globais (Regras Obrigatórias)</h3>
+                    <div class="grid">
+                        <div class="card warning">
+                            <h4>🔒 RESOURCE_CAP</h4>
+                            <p>Orçamento de memória/CPU por tenant para evitar denial-of-service.</p>
+                            <code>if tenant_usage > quota: DENY + alert</code>
+                        </div>
+                        <div class="card warning">
+                            <h4>🔗 CODE_IDENTITY</h4>
+                            <p>Hash de policy/agente inalterado pós-deploy para garantir integridade.</p>
+                            <code>if sha256(policy) != deployed_hash: LOCK</code>
+                        </div>
+                        <div class="card warning">
+                            <h4>🧵 DATA_LINEAGE</h4>
+                            <p>Cadeia SHA-256 contínua; quebra → DENY + LOCK_SESSION.</p>
+                            <code>if prev_hash != compute_hash(prev): DENY</code>
+                        </div>
+                        <div class="card warning">
+                            <h4>✅ OPA_FINALITY</h4>
+                            <p>Nenhuma transição DB sem allow==true + commit_token do OPA.</p>
+                            <code>if !opa_allow || !commit_token: ROLLBACK</code>
+                        </div>
+                        <div class="card warning">
+                            <h4>🤖 AI_NO_MUTATION</h4>
+                            <p>LLM propõe, apenas o Kernel executa writes (separação de concerns).</p>
+                            <code>if agent_type == "LLM" && action == "write": DENY</code>
+                        </div>
+                        <div class="card warning">
+                            <h4>⏱️ DEFENSE_TIMER</h4>
+                            <p>Pipeline de defesa ≤ 300 segundos (SLA crítico para advogados).</p>
+                            <code>if elapsed > 300s: TIMEOUT + fallback</code>
+                        </div>
+                    </div>
+                    <p style="margin-top:1rem;"><strong>Por que importa:</strong> Mostra pensamento em segurança, governança e sistemas distribuídos desde o design.</p>
+                </div>
+            </div>
+            
+            <!-- AGCP WORKFLOWS -->
+            <div id="spec-agcp" class="tab-content">
+                <div class="card">
+                    <h3>Workflows AGCP Detalhados</h3>
+                    <pre class="ascii">┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                    AGCP: GOVERNANCE CONTROL PLANE WORKFLOWS                         │
+│                                                                                      │
+│  1️⃣ CANONICAL STATE QUALIFICATION (AGCP)                                           │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │ Entrada: RawState{freshness, completeness, provenance, confidence}          │   │
+│  │                                                                             │   │
+│  │ Regras:                                                                     │   │
+│  │ • freshness < 24h → PASS else FAIL                                          │   │
+│  │ • completeness == all_required_fields → PASS else FAIL                      │   │
+│  │ • provenance verified via hash chain → PASS else FAIL                       │   │
+│  │ • confidence ≥ 0.85 → PASS else FLAG_FOR_REVIEW                             │   │
+│  │                                                                             │   │
+│  │ Saída: CanonicalState{qualified: bool, reasons: [], timestamp}              │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                      │
+│  2️⃣ ADMISSIBLE SET ADJUDICATION                                                    │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │ Entrada: CandidateTransitions[] (múltiplas possíveis)                        │   │
+│  │                                                                             │   │
+│  │ Processo:                                                                   │   │
+│  │ 1. Scheduler gera N transições candidatas                                    │   │
+│  │ 2. Re-deriva autoridade no commit (re-check OPA)                            │   │
+│  │ 3. Resolve conflitos via voto majoritário + timestamp tie-breaker          │   │
+│  │ 4. Aplica binding validation: policy + context → allow/deny                 │   │
+│  │                                                                             │   │
+│  │ Saída: AdmissibleTransition{selected_id, binding_proof, audit_entry}        │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                      │
+│  3️⃣ BINDING VALIDATION (OPA + Context)                                            │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
+│  │ Entrada: Policy(Rego) + Context{user, role, resource, action}                │   │
+│  │                                                                             │   │
+│  │ Avaliação OPA:                                                              │   │
+│  │ • opa eval --input context.json policy.rego                                 │   │
+│  │ • Timeout: 2s (invariante global)                                           │   │
+│  │ • Result: {allow: bool, trace: [], token: jwt}                              │   │
+│  │                                                                             │   │
+│  │ Saída: BindingDecision{allow, token, trace_id, expires_at}                  │   │
+│  └─────────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────┘</pre>
+                    <p><strong>Por que importa:</strong> Evidencia conhecimento em sistemas distribuídos, consenso, validação de políticas e auditoria determinística.</p>
+                </div>
+            </div>
+            
+            <!-- DEPENDENCIES -->
+            <div id="spec-deps" class="tab-content">
+                <div class="card">
+                    <h3>Dependências Exatas (Reprodutibilidade)</h3>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🐍 Backend (pyproject.toml)</h4>
+                            <pre class="ascii">[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+agentscope = "^0.5.0"
+sqlalchemy = "^2.0.0"
+psycopg2-binary = "^2.9.0"
+alembic = "^1.12.0"
+redis = "^5.0.0"
+celery = "^5.3.0"
+pydantic = "^2.0.0"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+bcrypt = "^4.0.0"
+spacy = "^3.7.0"
+sentence-transformers = "^2.2.0"
+pgvector = "^0.2.0"
+python-gnupg = "^0.5.0"
+structlog = "^24.0.0"
+prometheus-client = "^0.19.0"
+opentelemetry-api = "^1.22.0"</pre>
+                        </div>
+                        <div class="card success">
+                            <h4>⚛️ Frontend (package.json)</h4>
+                            <pre class="ascii">{
+  "dependencies": {
+    "next": "14.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.0.0",
+    "tailwindcss": "3.3.0",
+    "zustand": "4.4.0",
+    "@tanstack/react-query": "5.0.0",
+    "chart.js": "4.4.0",
+    "react-chartjs-2": "5.2.0",
+    "reactflow": "11.8.0",
+    "socket.io-client": "4.5.0"
+  }
+}</pre>
+                        </div>
+                    </div>
+                    <p><strong>Por que importa:</strong> Permite reprodução exata do ambiente, essencial para CI/CD, segurança e manutenção.</p>
+                </div>
+            </div>
+            
+            <!-- PROMPTS -->
+            <div id="spec-prompts" class="tab-content">
+                <div class="card">
+                    <h3>Prompts de Geração/Execução da IA</h3>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>🤖 Prompt para Gerar o Sistema</h4>
+                            <pre class="ascii">Você é um engenheiro de software sênior especialista em arquitetura de sistemas.
+Construa a plataforma Fellow Governance seguindo EXATAMENTE estas especificações:
+
+ESPECIFICAÇÃO TÉCNICA COMPLETA
+[INSERIR AQUI O CONTEÚDO COMPLETO DAS SEÇÕES 1 A 11 DO DOCUMENTO]
+
+REGRAS OBRIGATÓRIAS
+• Backend: Python 3.11 + FastAPI + agentscope
+• Frontend: Next.js 14 + React 18 + Tailwind
+• Banco: PostgreSQL 14+pgvector
+• 22 agentes (A01–A18 + D01–D04)
+• SEK com GlobalEventBus, DeterministicScheduler, StateTransitionEngine
+• QILIS: AMSE, RBCO, KB, IOG
+• PBSAI: MSB-21 (21 controles), 12 domínios, evidence graph
+• AGCP: vocabulary enforcement, canonical state, admissible set
+• Defesa: D01–D04 com timer de 300 segundos
+• Invariantes: 6 (incluindo DEFENSE_TIMER)
+
+FORMATO DE SAÍDA
+• Código organizado em pastas: backend/app/, frontend/
+• Cada arquivo com explicação do propósito
+• Comentários inline para partes críticas
+• README com instruções de instalação e execução
+• Comece pelo backend, depois frontend, depois infraestrutura.</pre>
+                        </div>
+                        <div class="card warning">
+                            <h4>⚖️ Prompt para Executar Modo Defesa</h4>
+                            <pre class="ascii">Execute o modo defesa da plataforma Fellow Governance com:
+
+CASO: "Cliente multado R$2M por 'viés algorítmico' em licitação pública"
+FRAMEWORK: "NIST AI RMF + PL 2338/2023"
+DOCUMENTOS: auto_infracao.pdf, modelo_ml_relatorio.pdf
+DADOS_TREINO: csv_anonimizado.csv
+
+REGRAS:
+• Tempo máximo: 300 segundos
+• Deve detectar gaps MSB-21 #2, #7, #21
+• Deve gerar policy regressiva limitando autoridade de agente público
+• Deve incluir evidência QILIS de drift > 0.15
+
+SAÍDA: JSON com furos_detectados, defesa_proposta, forensic_zip, policy_regressiva</pre>
+                        </div>
+                    </div>
+                    <p><strong>Por que importa:</strong> Mostra domínio de engenharia de prompt, controle de output e integração LLM + sistema determinístico.</p>
+                </div>
+            </div>
+            
+            <!-- QILIS/PBSAI -->
+            <div id="spec-qilis" class="tab-content">
+                <div class="card">
+                    <h3>Detalhes de QILIS e PBSAI</h3>
+                    <div class="grid">
+                        <div class="card purple">
+                            <h4>🔬 QILIS: Interpretabilidade Intrínseca</h4>
+                            <pre class="ascii">┌─────────────────────────────────────────────────┐
+│ QILIS COMPONENTES                               │
+├─────────────────────────────────────────────────┤
+│ AMSE (Adaptive Model State Extraction)          │
+│ • Computa relevance vectors por camada/sample   │
+│ • Dimensão: 512 floats por vector               │
+│ • Persiste em kb_state (pgvector)               │
+│                                                 │
+│ RBCO (Relevance-Based Confidence Oracle)        │
+│ • Gating adaptativo: confidence = f(relevance)  │
+│ • Threshold dinâmico por domínio                │
+│                                                 │
+│ KB (Knowledge Base)                             │
+│ • pgvector para busca por similaridade          │
+│ • TTL 24h para vetores, refresh on-demand       │
+│                                                 │
+│ IOG (Interpretability Output Generator)         │
+│ • Saídas por perfil: dev/analyst/auditor/user   │
+│ • Heatmaps, gráficos, explicações NL            │
+└─────────────────────────────────────────────────┘</pre>
+                        </div>
+                        <div class="card info">
+                            <h4>🛡️ PBSAI: Segurança por Design</h4>
+                            <pre class="ascii">┌─────────────────────────────────────────────────┐
+│ PBSAI: 21 CONTROLES MSB-21 + 12 DOMÍNIOS       │
+├─────────────────────────────────────────────────┤
+│ MSB-21 (Minimum Security Baseline):             │
+│ #1  Inventory de modelos                       │
+│ #2  AIBOM assinado (AI Bill of Materials)      │
+│ #3  Hermetic builds + pinned deps              │
+│ #4  Provenance de datasets                     │
+│ #5  Drift monitoring (QILIS)                   │
+│ ... (21 controles totais)                      │
+│                                                 │
+│ 12 Domínios de Governança:                      │
+│ A-GRC  (Governance, Risk, Compliance)          │
+│ F-Data (Data Quality, Lineage)                 │
+│ K-SupplyChain (Third-party risk)               │
+│ ... (12 domínios totais)                       │
+│                                                 │
+│ Evidence Graph:                                 │
+│ • Árvore de evidências (react-flow/d3)         │
+│ • Mostra controles atendidos/violados          │
+│ • Linka para audit_trails e kb_state           │
+└─────────────────────────────────────────────────┘</pre>
+                        </div>
+                    </div>
+                    <p><strong>Por que importa:</strong> Demonstra especialização em interpretabilidade de IA, segurança proativa e conformidade regulatória.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="background:var(--primary); color:white; text-align:center; padding:3rem 1.5rem; margin-top:2rem;">
+        <h2 style="color:var(--accent);">✅ Conclusão</h2>
+        <p style="max-width:800px; margin:1rem auto; opacity:0.9;">Fellow Governance entrega governança de IA completa, defesa adversarial em 5 minutos, 22 agentes especializados, interpretabilidade intrínseca (QILIS), segurança por design (PBSAI), execução determinística e auditável, pronto para produção (K8s, CI/CD).</p>
+        
+        <!-- BOTÕES SOCIAIS NO FOOTER -->
+        <div class="social-links" style="margin-top:2rem;">
+            <a href="https://www.linkedin.com/in/fabio-everton-3b62b1129/" target="_blank" class="btn-social">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                LinkedIn
+            </a>
+            <a href="https://github.com/FABIOEVERTON/Fellow_Reg" target="_blank" class="btn-social github">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub (Recrutadores)
+            </a>
+        </div>
+        
+        <!-- REFERÊNCIAS TÉCNICAS -->
+        <div style="margin-top:2rem; font-size:0.85rem; opacity:0.7;">
+            <strong>🔗 Dependências Chave:</strong><br>
+            <a href="https://github.com/modelscope/agentscope" target="_blank" style="color:var(--info);">agentscope</a> • 
+            <a href="https://github.com/open-policy-agent/opa" target="_blank" style="color:var(--info);">OPA</a> • 
+            <a href="https://github.com/pgvector/pgvector" target="_blank" style="color:var(--info);">pgvector</a>
+        </div>
+    </section>
+
+    <script>
+        // UTILS
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        const show = id => { const el = document.getElementById(id); el.style.display='block'; el.classList.add('active'); };
+        const log = (id, txt) => { const el = document.getElementById(id); el.textContent += (el.textContent ? '\n' : '') + txt; el.scrollTop = el.scrollHeight; };
+        
+        // TAB SWITCHING - ARCHITECTURE
+        function switchArchTab(tabId) {
+            document.querySelectorAll('#arch-tabs .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#architecture .tab-content').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('arch-' + tabId).classList.add('active');
+        }
+        
+        // TAB SWITCHING - OUTPUTS
+        function switchOutTab(tabId) {
+            document.querySelectorAll('#outputs .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#outputs .tab-content').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('out-' + tabId).classList.add('active');
+        }
+
+        // TAB SWITCHING - SPECS
+        function switchSpecTab(tabId) {
+            document.querySelectorAll('#spec-tabs .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#specs .tab-content').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('spec-' + tabId).classList.add('active');
+        }
+
+        // POPULATE ALL 22 AGENTS
+        const allAgents = [
+            ['A01','Monitor Legislativo','RawFeed','LegislativeChanges[]','JSON'],
+            ['A02','Simulador Impacto','PolicyChange+MuniData','SimulationResult{proj,var%,flags}','JSON'],
+            ['A03','Validação Dados','StructuredNode[]@v2.1','ValidatedNode[]+Rejects','JSON'],
+            ['A04','Demandas Inteligência','RawMsg{text,channel}','StructuredTicket{type,prio,fields}','JSON'],
+            ['A05','Motor de Risco','ValidatedNode+SimRes','RiskScore{fiscal,legal,ops,all}','JSON'],
+            ['A06','Reconciliador','Dataset[]@v2.1','Reconciled{consensus,conflicts}','JSON'],
+            ['A07','Gov IA Classifier','UsageLogs+Policies','AIAdmissibility{status,tags}','JSON'],
+            ['A08','Auditor QILIS','FullTrace+KB_State','AuditGraph{chain,forensic_hash}','JSON'],
+            ['A09','Output Generator','AllOutputs+OPADecision','FinalOutput{zip,sig,json}','ZIP+GPG'],
+            ['A10','Auditoria Estrutural','DocumentChunk[]','StructuredNode[]{type,span,class}','JSON'],
+            ['A11','Conhecimento Externo','Query+Embed','EnrichedCtx{refs,drift}','JSON'],
+            ['A12','Gatekeeper OPA','PolicyBundle+Ctx','OPADecision{allow,token,trace}','JSON'],
+            ['A13','Integrador Universal','Config+Creds','DocChunk[]+RawPayloads','Binário+JSON'],
+            ['A14','Análise Dados Públicos','PublicFeeds','PublicAnalysis{trends,metrics}','JSON'],
+            ['A15','Curador Insights','RawInsights+Changes','Curated{ranked,synth}','JSON'],
+            ['A16','Shadow AI Detector','Net/UsageLogs','ShadowAIReport{unauth,risk}','JSON'],
+            ['A17','Policy-as-Code YAML','Rules+RiskScore','PolicyDraftYAML','YAML'],
+            ['A18','Compiler Rego','PolicyDraftYAML','PolicyBundle{rego,status,sha}','Rego'],
+            ['D01','Analisador Adversarial','DefenseInput','ExtractedEntities','JSON'],
+            ['D02','Gap Finder MSB-21','ExtractedEntities+framework','GapList[]','JSON'],
+            ['D03','Evidência QILIS Defesa','dados_treino','QILISDefenseEvidence','JSON'],
+            ['D04','Gerador Rego Regressivo','GapList+QILISEvidence','PolicyRegressiva','Rego']
+        ];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Grid de 22 agentes
+            const grid = document.getElementById('agent-grid');
+            allAgents.forEach(a => {
+                const d = document.createElement('div'); 
+                d.className='card'; 
+                d.innerHTML=`<h3>${a[0]}</h3><p>${a[1]}</p><p style="font-size:0.85rem; color:var(--muted)">In: ${a[2]} → Out: ${a[3]} (${a[4]})</p>`;
+                d.onclick = () => alert(`${a[0]} - ${a[1]}\nEntrada/Saída definidos por contratos Pydantic.\nFormato: ${a[4]}`);
+                grid.appendChild(d);
+            });
+            // Tabela de 22 agentes
+            const tbody = document.getElementById('agent-table-body');
+            allAgents.forEach(a => {
+                const tr = document.createElement('tr'); 
+                tr.innerHTML=`<td>${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td><td>${a[3]}</td><td><span class="badge ${a[4]==='JSON'?'b-json':a[4]==='Rego'?'b-rego':'b-zip'}">${a[4]}</span></td>`;
+                tbody.appendChild(tr);
+            });
+        });
+
+        // SIMULATIONS (lógica preservada 100%)
+        async function simProblem() {
+            show('panel-problem'); document.getElementById('out-problem').textContent='';
+            log('out-problem','[SEM FELLOW GOVERNANCE]\nDia 1: CEO pressiona ML. Governança ignorada. Modelo vai ao ar.');
+            await sleep(600); log('out-problem','Dia 90: ANPD multa R$2.3M por viés. Demitem Governance AI.');
+            await sleep(600); log('out-problem','[COM FELLOW GOVERNANCE]\nA12 (OPA) avalia: MSB-21 #2 ❌ AIBOM missing → allow_deploy = false.');
+            await sleep(600); log('out-problem','CEO tenta bypass → Audit trail registra hash imutável (SHA-256).');
+            await sleep(600); log('out-problem','Governance AI apresenta risco real. CEO alinha. Deploy bloqueado. Ciclo quebrado.');
+        }
+        async function simAgents() {
+            show('panel-agents'); document.getElementById('out-agents').textContent='';
+            log('out-agents','▶ Iniciando orquestração SEK...'); await sleep(300);
+            log('out-agents','[A13] Converte PDF/CSV → DocChunk[]'); await sleep(300);
+            log('out-agents','[A10] Extrai StructuredNode[] → QILIS AMSE computa vetores pgvector'); await sleep(300);
+            log('out-agents','[A01+A05+A02] Paralelos: Monitor, Risco, Simulador'); await sleep(300);
+            log('out-agents','[PBSAI] Valida MSB-21 → #2 FAIL, #15 WARN'); await sleep(300);
+            log('out-agents','[A17→A18] YAML → Rego compilado → opa check PASS'); await sleep(300);
+            log('out-agents','[A12] OPA eval → allow: false (violação #2)'); await sleep(300);
+            log('out-agents','[A08→A09] Hash chain → ZIP GPG assinado. Pipeline OK.');
+        }
+        async function simLawyer() {
+            show('panel-lawyer'); document.getElementById('out-lawyer').textContent='';
+            log('out-lawyer','⚖️ UPLOAD: auto_infracao.pdf + modelo.pdf + treino.csv'); await sleep(400);
+            log('out-lawyer','▶ EXECUTANDO D01-D04 (Timer 300s)'); await sleep(400);
+            log('out-lawyer','[D01] Entidades: penalty=2M, bias=true, context=licitacao'); await sleep(400);
+            log('out-lawyer','[D02] Gaps: MSB-21 #2 (NIST 4.2.3), #7 (PL2338 Art.7)'); await sleep(400);
+            log('out-lawyer','[D03] QILIS Drift: 0.23 > 0.15 → Causalidade ausente comprovada'); await sleep(400);
+            log('out-lawyer','[D04] Policy Regressiva gerada + ZIP Forense assinado'); await sleep(400);
+            log('out-lawyer','✅ DEFESA PRONTA: 3 linhas + evidências JSON/Rego. Download ZIP.');
+        }
+        async function simGovernance() {
+            show('panel-gov'); document.getElementById('out-gov').textContent='';
+            log('out-gov','👤 DIA 1 Governance AI Lead loga em Fellow Governance'); await sleep(300);
+            log('out-gov','📊 DASHBOARD: 15 modelos | 8 Risco Alto | 12 sem AIBOM | 5 drift >0.15'); await sleep(300);
+            log('out-gov','🔍 Clica em credito_v3 → Drift 0.28 | MSB-21 #15 VIOLADO'); await sleep(300);
+            log('out-gov','🛡️ Clica "BLOQUEAR DEPLOY" → OPA retorna allow_deploy=false'); await sleep(300);
+            log('out-gov','⚠️ CEO tenta override → Sistema exige justificativa | Hash registrado'); await sleep(300);
+            log('out-gov','📄 Gera Relatório Executivo → ROI 30x (R$150K evita R$4.5M)'); await sleep(300);
+            log('out-gov','✅ Governança tem poder real. CEO alinha. Deploy suspenso para correção.');
+        }
+        async function simPipeline() {
+            show('panel-pipe'); document.getElementById('out-pipe').textContent='';
+            const bar = document.getElementById('pipe-bar');
+            const steps = ['1. Upload → POST /api/v1/diagnostic','2. A13 → DocChunk[] + S3','3. A10+QILIS → Vetores pgvector','4. A01+A05+PBSAI → Análise paralela','5. A17→A18→A12 → Rego+OPA','6. A08→A09 → ZIP GPG + Download'];
+            for(let i=0; i<steps.length; i++){
+                await sleep(400);
+                bar.style.width = `${(i+1)*16.6}%`; bar.textContent = `${Math.round((i+1)*16.6)}%`;
+                log('out-pipe', `[PASSO ${i+1}] ${steps[i]}`);
+            }
+            await sleep(300); log('out-pipe', '✅ PIPELINE COMPLETO | run_id: uuidv7-2026-04-19 | Tempo: ~4.8s');
+        }
+        function showTimeline() {
+            show('panel-timeline');
+            document.getElementById('out-timeline').textContent = `
+Dia 1-7: Instalar Python 3.11, Node.js 18, Docker, Git. poetry init, pnpm create next-app, docker-compose. (14h)
+Dia 8-14: PostgreSQL, JWT, RBAC, Models/Migrations (Tenant, User, Document, AgentRun). (14h)
+Dia 15-21: agentscope, SEK, EventBus, Scheduler, StateEngine, PolicyGate (OPA). (21h)
+Dia 22-28: A01-A03 (Monitor, Simulador, Validação). (21h)
+Dia 29-35: A04-A08 (Demandas, Risco, Reconciliador, Gov, Auditor). (21h)
+Dia 36-42: A09-A14 (Output, Estrutural, Conhecimento, Gatekeeper, Integrador, DadosPúblicos). (21h)
+Dia 43-49: A15-A18 + QILIS (Curador, Shadow, YAML, Rego, AMSE/RBCO/KB/IOG). (28h)
+Dia 50-56: PBSAI (MSB-21, 12 domínios, evidence graph, PQC). (28h)
+Dia 57-63: AGCP (Vocabulary, canonical state, admissible set, FVL). (21h)
+Dia 64-71: Defesa D01-D04 + Timer 300s + DefenseOrchestrator. (24h)
+Dia 72-82: Frontend: ChatInterface, PolicyViewer, EvidenceGraph, KB_Inspector, QILIS_Dashboard. (33h)
+Dia 83-90: pytest, Playwright, GitHub Actions, Helm, Docs, Smoke tests. (24h)
+Total: ~250 horas | Entregas semanais com PRs documentados e CI/CD.`;
+        }
+    </script>
+</body>
+</html>

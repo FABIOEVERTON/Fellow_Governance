@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Fellow Governance · Arquitetura Completa · 100% do Documento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #f0f4f9;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #1a2c3e;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+        .container { max-width: 1440px; margin: 0 auto; }
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0a2e3f 0%, #1b6b5e 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            padding-left: 1rem;
+            border-left: 5px solid #1b6b5e;
+        }
+        h3 { font-size: 1.3rem; font-weight: 600; margin: 1rem 0; }
+        .badge {
+            background: rgba(27,107,94,0.12);
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1b6b5e;
+        }
+        .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn {
+            padding: 0.6rem 1.3rem;
+            border-radius: 48px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        .btn-outline { border: 1px solid #cbdde6; background: white; color: #1f5e6e; }
+        .btn-primary { background: #1b6b5e; color: white; }
+        .hero { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .parallel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; }
+        .premium-card {
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
+        }
+        .card-header { padding: 1.2rem 1.8rem; font-weight: 700; font-size: 1.25rem; border-bottom: 2px solid; }
+        .gov-header { background: #f6fefb; border-bottom-color: #1b6b5e; }
+        .legal-header { background: #fef8f5; border-bottom-color: #c44536; }
+        .card-body { padding: 1.6rem; }
+        .action-btn {
+            background: #1b6b5e;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 1rem 0;
+            transition: all 0.2s;
+        }
+        .action-btn-secondary { background: #c44536; }
+        .backend-log {
+            background: #0e1f2a;
+            border-radius: 20px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #7bc5ae;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .agent-chain { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; align-items: center; }
+        .agent-node { background: #ecf7f3; border-radius: 40px; padding: 0.3rem 0.9rem; font-size: 0.7rem; font-weight: 600; color: #1b6b5e; }
+        .mig-section { background: white; border-radius: 32px; padding: 1.5rem; margin: 2rem 0; }
+        .chart-container { height: 400px; width: 100%; }
+        .legend { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1rem; font-size: 0.75rem; flex-wrap: wrap; }
+        .legend-color { width: 16px; height: 16px; border-radius: 20px; display: inline-block; margin-right: 6px; }
+        .flow-wrapper { background: white; border-radius: 32px; padding: 1.5rem; margin: 2rem 0; }
+        .invariants-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .invariant-card { background: white; border-radius: 24px; padding: 1rem; border-left: 4px solid #1b6b5e; }
+        .timer-bar { background: #e9ecef; border-radius: 12px; height: 8px; margin: 0.5rem 0; overflow: hidden; }
+        .timer-progress { background: #c44536; width: 0%; height: 100%; transition: width 0.1s linear; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; margin: 1rem 0; }
+        th { background: #eef2f9; padding: 0.8rem; text-align: left; font-weight: 600; }
+        td { padding: 0.7rem; border-bottom: 1px solid #eef2f6; }
+        details { margin: 1rem 0; border: 1px solid #e9edf2; border-radius: 20px; background: #fafcfd; }
+        summary { padding: 0.8rem 1.2rem; font-weight: 600; cursor: pointer; color: #1b6b5e; }
+        pre { background: #0e1f2a; color: #e2f0fa; padding: 1rem; border-radius: 16px; overflow-x: auto; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: white;
+            border-radius: 32px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .source-config { background: #f8fafc; border-radius: 16px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.75rem; }
+        footer { margin-top: 3rem; text-align: center; font-size: 0.75rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+        @media (max-width: 900px) { .parallel-grid { grid-template-columns: 1fr; } body { padding: 1rem; } }
+        .badge-success { background: #d4edda; color: #155724; }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <div>
+            <h1>Fellow Governance</h1>
+            <p style="color: #5b6e7c;">SaaS de Governança de IA · Interpretabilidade Geométrica (MIG) · Defesa Adversarial · Cadeia Imutável SHA-256</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                <span class="badge">NIST AI RMF</span><span class="badge">EU AI Act</span><span class="badge">PL 2338/2023</span>
+                <span class="badge">MSB-21</span><span class="badge">MIG/QILIS</span><span class="badge">OPA/Rego</span>
+            </div>
+        </div>
+        <div class="btn-group">
+            <a href="https://github.com/FABIOEVERTON/Fellow_Governance" target="_blank" class="btn btn-outline">📦 GitHub</a>
+            <a href="https://www.linkedin.com/in/fabio-everton-3b62b1129/" target="_blank" class="btn btn-primary">🔗 LinkedIn</a>
+        </div>
+    </div>
+
+    <!-- ==================== MIG COMPLETO ==================== -->
+    <div class="mig-section">
+        <h2>🔬 MIG: Geometric Interpretability Engine (QILIS-inspired)</h2>
+        <p><strong>AMSE · RBCO · KB · IOG</strong> — Hilbert Space + Relevance Vectors (configurável 256/512/768/1024)</p>
+        <div class="chart-container">
+            <canvas id="migChart" width="800" height="400"></canvas>
+        </div>
+        <div class="legend">
+            <div><span class="legend-color" style="background: #1b6b5e;"></span> Vetor de Decisão (IA)</div>
+            <div><span class="legend-color" style="background: #c44536;"></span> Variáveis Protegidas · relevância &lt; 0.03</div>
+            <div><span class="legend-color" style="background: #8ba0b0;"></span> Features Neutras</div>
+            <div><span class="legend-color" style="background: #f4a261;"></span> Projeção Euclidiana</div>
+        </div>
+        <details><summary><strong>🔍 AMSE, RBCO, KB, IOG - Detalhes técnicos</strong></summary>
+            <pre>AMSE (Adaptive Model State Extraction): extrai vetores de relevância por camada
+RBCO (Relevance-Based Confidence Oracle): calcula confiança adaptativa baseada em vetores
+KB (Knowledge Base): armazena vetores em pgvector com TTL 90d
+IOG (Interpretability Output Generator): gera heatmaps, gráficos e explicações em NL</pre>
+        </details>
+    </div>
+
+    <!-- ==================== JORNADA PARALELA ==================== -->
+    <h2>🔄 Jornada Paralela: Frontend + Backend Rastreável</h2>
+    <div class="parallel-grid">
+        <div class="premium-card">
+            <div class="card-header gov-header">🛡️ AI Governance Lead · MSB-21 + OPA Blocking</div>
+            <div class="card-body">
+                <button class="action-btn" id="btnGovernance">🚀 Executar Diagnóstico (A07→A08→A12→OPA)</button>
+                <div class="agent-chain">
+                    <span class="agent-node">A07 Classifier</span><span class="agent-arrow">→</span>
+                    <span class="agent-node">A08 MIG Auditor</span><span class="agent-arrow">→</span>
+                    <span class="agent-node">A12 OPA Gatekeeper</span>
+                </div>
+                <div id="govLog" class="backend-log">⚡ Clique para simular</div>
+            </div>
+        </div>
+        <div class="premium-card">
+            <div class="card-header legal-header">⚖️ Legal Counsel · Modo Defesa (≤300s)</div>
+            <div class="card-body">
+                <button class="action-btn action-btn-secondary" id="btnLegal">⚡ Gerar Defesa Adversarial</button>
+                <div class="agent-chain">
+                    <span class="agent-node">D01 Analyzer</span><span class="agent-arrow">→</span>
+                    <span class="agent-node">D02 Gap Finder</span><span class="agent-arrow">→</span>
+                    <span class="agent-node">D03 MIG Evidence</span><span class="agent-arrow">→</span>
+                    <span class="agent-node">D04 Rego Compiler</span>
+                </div>
+                <div id="legalLog" class="backend-log">📜 Clique para simular</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TABELA COMPLETA DOS 22 AGENTES ==================== -->
+    <h2>🤖 Os 22 Agentes Especializados (A01–A18 + D01–D04)</h2>
+    <details open>
+        <summary><strong>📋 Matriz completa de agentes com I/O</strong></summary>
+        <div class="two-columns">
+            <div>
+                <h4>Agentes de Análise (A01-A18)</h4>
+                <table style="font-size:0.7rem">
+                    <tr><th>ID</th><th>Nome</th><th>Entrada</th><th>Saída</th></tr>
+                    <tr><td>A01</td><td>Legislative Monitor</td><td>Lei/bill</td><td>Mudanças legislativas</td></tr>
+                    <tr><td>A02</td><td>Impact Simulator</td><td>Modelo + cenário</td><td>Risco fiscal/legal</td></tr>
+                    <tr><td>A03</td><td>Data Validator</td><td>CSV/JSON</td><td>Relatório qualidade</td></tr>
+                    <tr><td>A04</td><td>Intelligence Demands</td><td>NL query</td><td>Plano de coleta</td></tr>
+                    <tr><td>A05</td><td>Risk Engine</td><td>Features</td><td>Matriz de risco</td></tr>
+                    <tr><td>A06</td><td>Framework Reconciler</td><td>NIST/EU/PL2338</td><td>Controles cross-mapped</td></tr>
+                    <tr><td>A07</td><td>AI Governance Classifier</td><td>Metadados modelo</td><td>Maturidade 1-5</td></tr>
+                    <tr><td>A08</td><td>MIG Auditor</td><td>Vetores camada</td><td>Relatório interpretabilidade</td></tr>
+                    <tr><td>A09</td><td>Output Generator</td><td>Resultados parciais</td><td>Relatório consolidado</td></tr>
+                    <tr><td>A10</td><td>Structural Auditor</td><td>Código/Modelo</td><td>Checklist boas práticas</td></tr>
+                    <tr><td>A11</td><td>External Knowledge Integrator</td><td>Query + fontes</td><td>Contexto enriquecido</td></tr>
+                    <tr><td>A12</td><td>OPA Gatekeeper</td><td>Ação + contexto</td><td>allow/deny + reason</td></tr>
+                    <tr><td>A13</td><td>Universal Integrator</td><td>PDF/CSV/API/DB</td><td>Dados normalizados</td></tr>
+                    <tr><td>A14</td><td>Active Hunter</td><td>Tópico legal</td><td>Precedentes (fontes configuráveis)</td></tr>
+                    <tr><td>A15</td><td>Insight Curator</td><td>Evidência</td><td>Recomendações</td></tr>
+                    <tr><td>A16</td><td>Shadow AI Detector</td><td>Logs rede/app</td><td>Inventário não governado</td></tr>
+                    <tr><td>A17</td><td>Policy-as-Code YAML</td><td>Controles selecionados</td><td>YAML estruturado</td></tr>
+                    <tr><td>A18</td><td>Rego Compiler</td><td>YAML + templates</td><td>Bundle .rego</td></tr>
+                </table>
+            </div>
+            <div>
+                <h4>Agentes de Defesa (D01-D04)</h4>
+                <table style="font-size:0.7rem">
+                    <tr><th>ID</th><th>Nome</th><th>Entrada</th><th>Saída</th></tr>
+                    <tr><td>D01</td><td>Adversarial Analyzer</td><td>Notificação + docs</td><td>Entidades + tese inicial</td></tr>
+                    <tr><td>D02</td><td>MSB-21 Gap Finder</td><td>Evidência + baseline</td><td>Lista de gaps com confiança</td></tr>
+                    <tr><td>D03</td><td>MIG Evidence Generator</td><td>Vetores relevância</td><td>Gráfico + explicação NL</td></tr>
+                    <tr><td>D04</td><td>Regressive Rego Generator</td><td>Gap + contexto</td><td>Política limitadora de autoridade</td></tr>
+                </table>
+            </div>
+        </div>
+    </details>
+
+    <!-- ==================== A14 ACTIVE HUNTER (USER-CONFIGURABLE) ==================== -->
+    <h2>🔌 A14 - Active Hunter (Integrações configuráveis pelo usuário)</h2>
+    <details>
+        <summary><strong>📡 Fontes configuráveis: REST APIs, Webhooks, RSS, Files, LLM Extractor</strong></summary>
+        <div class="source-config">
+            <strong>Tipos de fonte suportados:</strong>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>REST APIs (STJ, ANPD, TJSP) → URL + API Key + endpoint pattern</li>
+                <li>Webhooks → Callback endpoint + webhook secret</li>
+                <li>RSS/Atom → Feed URL + polling interval (min 1h)</li>
+                <li>Files (PDF, HTML) → S3/GCS bucket + schedule</li>
+                <li>LLM Extractor → Prompt customizável + schema validation</li>
+            </ul>
+            <pre style="margin-top: 0.5rem;">POST /api/v1/sources → registra nova fonte
+GET /api/v1/sources → lista fontes configuradas
+Health check: falha → stale_data=true + fallback</pre>
+        </div>
+    </details>
+
+    <!-- ==================== PCG: GOVERNANCE CONTROL PLANE ==================== -->
+    <h2>⚖️ PCG: Governance Control Plane (3 estágios)</h2>
+    <details>
+        <summary><strong>Admissibility → Binding Validation → Execution</strong></summary>
+        <pre>1️⃣ ADMISSIBILITY: A proposta é legal? (PL 2338, LGPD, etc)
+   • freshness &lt; 24h → PASS
+   • completeness: all_required_fields → PASS
+   • provenance via hash chain → PASS
+   • confidence ≥ 0.85 → PASS
+
+2️⃣ BINDING VALIDATION: Autoridade existe no momento da execução?
+   • opa eval --input context.json policy.rego (timeout 2s)
+   • Retorna {allow: bool, trace: [], token: jwt}
+
+3️⃣ EXECUTION: Só após 1 e 2, ação se torna real
+   • Se violado → PCG halt + audit trail</pre>
+    </details>
+
+    <!-- ==================== AEC + HASH CHAIN + RECOVERY ==================== -->
+    <h2>🔗 AEC: Controlled Execution Architecture + SHA-256 Hash Chain</h2>
+    <details>
+        <summary><strong>Cadeia imutável + Procedimento de recuperação</strong></summary>
+        <pre>prev_hash = SHA256(previous.payload_hash + previous.timestamp)
+
+RECUPERAÇÃO DE QUEBRA:
+1. LOCK_SESSION → bloqueia escritas
+2. P0 alert → recovery_token (offline JWT, 1h)
+3. new_prev_hash = SHA256("RECOVERY_AFTER_BREAK_" + timestamp + token)
+4. Registro em recovery_events (imutável)
+5. Validação da nova cadeia → release writes</pre>
+    </details>
+
+    <!-- ==================== MSB-21 COMPLETO + 12 DOMÍNIOS ==================== -->
+    <h2>🛡️ PBSAI: MSB-21 (21 controles) + 12 Governance Domains</h2>
+    <details>
+        <summary><strong>21 controles de segurança mínima</strong></summary>
+        <div class="two-columns">
+            <div>
+                <table style="font-size:0.7rem">
+                    <tr><th>#</th><th>Controle</th></tr>
+                    <tr><td>1</td><td>Model Inventory</td></tr>
+                    <tr><td>2</td><td>Signed AIBOM</td></tr>
+                    <tr><td>3</td><td>Hermetic builds + pinned deps</td></tr>
+                    <tr><td>4</td><td>Dataset Provenance</td></tr>
+                    <tr><td>5</td><td>Drift monitoring (MIG)</td></tr>
+                    <tr><td>6</td><td>Human-in-the-loop</td></tr>
+                    <tr><td>7</td><td>Structured decision logging</td></tr>
+                    <tr><td>8</td><td>Evidence retention policy</td></tr>
+                    <tr><td>9</td><td>Pre-deploy bias tests</td></tr>
+                    <tr><td>10</td><td>Incident response plan</td></tr>
+                    <tr><td>11</td><td>Access control</td></tr>
+                </table>
+            </div>
+            <div>
+                <table style="font-size:0.7rem">
+                    <tr><th>#</th><th>Controle</th></tr>
+                    <tr><td>12</td><td>Encryption at rest/in transit</td></tr>
+                    <tr><td>13</td><td>Vulnerability scanning</td></tr>
+                    <tr><td>14</td><td>Penetration testing</td></tr>
+                    <tr><td>15</td><td>Secure development lifecycle</td></tr>
+                    <tr><td>16</td><td>Third-party risk assessment</td></tr>
+                    <tr><td>17</td><td>Transparency artifacts</td></tr>
+                    <tr><td>18</td><td>Explainability records</td></tr>
+                    <tr><td>19</td><td>Continuity plan</td></tr>
+                    <tr><td>20</td><td>Disaster recovery</td></tr>
+                    <tr><td>21</td><td>Annual audit</td></tr>
+                </table>
+            </div>
+        </div>
+        <h4>12 Governance Domains</h4>
+        <div class="two-columns">
+            <div>A-GRC: Governance, Risk, Compliance<br>B-Ethics: Ethics and Fairness<br>C-Privacy: Privacy and Data Protection<br>D-Security: Cybersecurity<br>E-Data: Data Quality, Lineage<br>F-Model: Model Development</div>
+            <div>G-Ops: Operations, Deployment<br>H-Human: Human-AI Interaction<br>I-Legal: Regulatory Compliance<br>J-Supply: Third-party Risks<br>K-Transp: Transparency<br>L-Resil: Resilience, Recovery</div>
+        </div>
+    </details>
+
+    <!-- ==================== FLUXO END-TO-END ==================== -->
+    <div class="flow-wrapper">
+        <h3>📡 Fluxo End-to-End: Cliente → SEK → Agentes → OPA → DB → WebSocket</h3>
+        <div class="mermaid">
+flowchart TB
+    Client[Cliente Web/Mobile] -->|JWT + tenant_id| Gateway[FastAPI Gateway]
+    Gateway --> SEK[System Execution Kernel<br/>EventBus · Scheduler · StateEngine]
+    SEK --> Agents[Agentes A01-A18 / D01-D04]
+    Agents --> OPA[OPA Policy Engine<br/>Rego + binding_token]
+    OPA -->|allow + JWT| AuditDB[(PostgreSQL+pgvector<br/>audit_trails SHA256)]
+    SEK --> WS[WebSocket /ws/pipeline]
+    WS --> Client
+    MIG[MIG Engine<br/>AMSE+RBCO+IOG] --> KB[(kb_state<br/>relevance vectors 90d TTL)]
+        </div>
+        <div id="flowStatus" style="font-family: monospace; font-size: 0.7rem; margin-top: 0.5rem;">🔵 Status: Aguardando ação</div>
+    </div>
+
+    <!-- ==================== 9 INVARIANTES COMPLETOS ==================== -->
+    <h2>🔒 9 Invariantes Globais (Execução Obrigatória)</h2>
+    <div class="invariants-grid">
+        <div class="invariant-card"><strong>🔗 DATA_LINEAGE</strong><div id="hashChainPreview" style="font-family:monospace;">prev_hash: a3f2e8c9b1d4f7a2</div><div>Quebra → LOCK_SESSION + recovery_events</div></div>
+        <div class="invariant-card"><strong>⏱️ DEFENSE_TIMER</strong><div class="timer-bar"><div id="timerProgress" class="timer-progress"></div></div><div id="timerText">⏳ 300s restantes</div><div>per-tenant semaphore max 1, global max 5</div></div>
+        <div class="invariant-card"><strong>✅ OPA_FINALITY</strong><div id="opaStatus">⏳ Aguardando</div><div>Nenhum commit sem allow==true + binding_token</div></div>
+        <div class="invariant-card"><strong>🔒 NO_TRAIL_REWRITE</strong><div>UPDATE em audit_trails bloqueado</div></div>
+        <div class="invariant-card"><strong>🤖 AI_NO_MUTATION</strong><div>Agentes LLM não escrevem diretamente</div></div>
+        <div class="invariant-card"><strong>📦 RESOURCE_CAP</strong><div>CPU/memória por tenant, prevenção DoS</div></div>
+        <div class="invariant-card"><strong>🔁 NO_RUN_REPROCESS</strong><div>run_id não pode ser reprocessado com lógica alterada</div></div>
+        <div class="invariant-card"><strong>🏷️ CODE_IDENTITY</strong><div>Hash da política inalterado pós-deploy</div></div>
+        <div class="invariant-card"><strong>🔀 NO_OPA_REINTERPRET</strong><div>Decisão OPA não pode ser re-interpretada após commit</div></div>
+    </div>
+
+    <!-- ==================== RATE LIMITING + ALERTAS + OPA FALLBACK ==================== -->
+    <h2>🚦 Rate Limiting, Alertas Críticos (SLOs) e Fallbacks OPA</h2>
+    <div class="two-columns">
+        <div>
+            <h4>Rate Limiting por endpoint</h4>
+            <table style="font-size:0.7rem">
+                <tr><th>Endpoint</th><th>Limite/tenant</th><th>Janela</th></tr>
+                <tr><td>POST /diagnostic/start</td><td>10</td><td>1 min</td></tr>
+                <tr><td>POST /defense/start</td><td>3</td><td>1 min</td></tr>
+                <tr><td>POST /opa/eval</td><td>100</td><td>1 min</td></tr>
+                <tr><td>POST /policies/compile</td><td>20</td><td>1 hora</td></tr>
+                <tr><td>GET /audit/{run_id}</td><td>200</td><td>1 min</td></tr>
+            </table>
+        </div>
+        <div>
+            <h4>Alertas Críticos (SLOs)</h4>
+            <table style="font-size:0.7rem">
+                <tr><th>Condição</th><th>Severidade</th><th>Ação</th></tr>
+                <tr><td>OPA timeout >2s</td><td>P1</td><td>Fallback policy cache</td></tr>
+                <tr><td>OPA offline >5s</td><td>P0</td><td>READ-ONLY mode</td></tr>
+                <tr><td>Hash chain break</td><td>P0</td><td>LOCK_SESSION</td></tr>
+                <tr><td>Defense >300s</td><td>P1</td><td>Timeout + degraded</td></tr>
+                <tr><td>CPU/Mem >90%</td><td>P2</td><td>Throttling</td></tr>
+            </table>
+        </div>
+    </div>
+    <details>
+        <summary><strong>OPA Fallback - 4 modos de operação</strong></summary>
+        <pre>Normal: OPA responde em &lt;2s → validação completa
+Degraded: OPA timeout 2s-5s → último cache + degraded_mode=true
+Read-only: OPA timeout >5s → bloqueia escritas, permite leituras
+Recovery: Health check a cada 30s → retorna ao modo Normal</pre>
+    </details>
+
+    <!-- ==================== DATABASE SCHEMA (16 TABELAS) ==================== -->
+    <h2>🗄️ Database Schema (16 tabelas + pgvector)</h2>
+    <details>
+        <summary><strong>Esquema completo com RLS e tenant isolation</strong></summary>
+        <div class="two-columns">
+            <div>
+                <pre style="font-size:0.65rem">
+tenants
+users
+documents
+agent_runs
+policies
+opa_decisions
+audit_trails (prev_hash chain)
+kb_state (pgvector, TTL 90d)
+msb21_attest
+pbsai_evid_graph
+defense_runs
+websocket_sessions
+feature_flags
+sources (A14 config)
+recovery_events
+adapters
+                </pre>
+            </div>
+            <div>
+                <pre style="font-size:0.65rem">
+-- RLS Policy
+CREATE POLICY tenant_isolation ON audit_trails
+  USING (tenant_id = current_setting('app.current_tenant')::uuid);
+
+-- Hash chain
+prev_hash = SHA256(previous.payload_hash + previous.timestamp)
+                </pre>
+            </div>
+        </div>
+    </details>
+
+    <!-- ==================== BUILD SCHEDULE ==================== -->
+    <h2>📅 Build Schedule (90 dias | ~250h)</h2>
+    <details>
+        <summary><strong>12 semanas de desenvolvimento</strong></summary>
+        <div class="two-columns">
+            <div>
+                <table style="font-size:0.7rem">
+                    <tr><th>Semana</th><th>Entregáveis</th></tr>
+                    <tr><td>1</td><td>Foundation: Docker, Git, FastAPI, Next.js</td></tr>
+                    <tr><td>2</td><td>Database + Auth: PostgreSQL+pgvector, JWT</td></tr>
+                    <tr><td>3</td><td>SEK: EventBus, Scheduler, StateEngine</td></tr>
+                    <tr><td>4</td><td>Agents A01-A03</td></tr>
+                    <tr><td>5</td><td>Agents A04-A08</td></tr>
+                    <tr><td>6</td><td>Agents A09-A14 + Active Hunter</td></tr>
+                </table>
+            </div>
+            <div>
+                <table style="font-size:0.7rem">
+                    <tr><th>Semana</th><th>Entregáveis</th></tr>
+                    <tr><td>7</td><td>A15-A18 + MIG (AMSE, RBCO, KB, IOG)</td></tr>
+                    <tr><td>8</td><td>PBSAI: MSB-21 validator + evidence graph</td></tr>
+                    <tr><td>9</td><td>PCG + SEC: canonical_state, admissible_set</td></tr>
+                    <tr><td>10</td><td>Defense D01-D04 + timer 300s</td></tr>
+                    <tr><td>11</td><td>Frontend: 13 componentes principais</td></tr>
+                    <tr><td>12</td><td>Testing + CI/CD + Docs</td></tr>
+                </table>
+            </div>
+        </div>
+    </details>
+
+    <!-- ==================== WEBSOCKET + RECONNECTION ==================== -->
+    <h2>🔌 WebSocket: Reconnection & Persistence</h2>
+    <details>
+        <summary><strong>Exponential backoff, last_seq, heartbeat</strong></summary>
+        <pre>Reconexão automática: 1s, 2s, 4s, 8s, 16s, max 30s
+last_seq: cliente envia {last_seq: 123} na reconexão
+Buffer: 5 minutos de mensagens
+Replay: servidor reenvia a partir do last_seq
+Heartbeat: Ping/Pong a cada 30s (timeout 60s)</pre>
+    </details>
+
+    <!-- ==================== MODAL ==================== -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal"><div style="display:flex; justify-content:space-between;"><h3 id="modalTitle">Resultado</h3><span style="cursor:pointer; font-size:1.5rem;" onclick="closeModal()">&times;</span></div><pre id="modalContent" style="white-space:pre-wrap;"></pre><button class="action-btn" onclick="closeModal()">Fechar</button></div>
+    </div>
+
+    <footer>
+        Fellow Governance · MIT License · 100% da arquitetura documentada · MIG (QILIS/Willis 2026) · OPA · MSB-21<br/>
+        PDF interativo: <code>weasyprint fellow-governance-architecture.html fellow-governance.pdf</code><br/>
+        Repositório: <a href="https://github.com/FABIOEVERTON/Fellow_Governance">github.com/FABIOEVERTON/Fellow_Governance</a>
+    </footer>
+</div>
+
+<script>
+    let migChart;
+    function initMIGChart() {
+        const ctx = document.getElementById('migChart').getContext('2d');
+        migChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: 'Features relevantes', data: [{x:0.92,y:0.88},{x:0.87,y:0.79}], backgroundColor:'#1b6b5e', pointRadius:8 },
+                    { label: 'Variáveis protegidas', data: [{x:0.02,y:0.01},{x:0.03,y:0.02}], backgroundColor:'#c44536', pointRadius:8 },
+                    { label: 'Features neutras', data: [{x:0.45,y:0.40},{x:0.30,y:0.35},{x:0.55,y:0.50}], backgroundColor:'#8ba0b0', pointRadius:6 },
+                    { label: 'Vetor de Decisão', data: [{x:0.9,y:0.85}], backgroundColor:'#1b6b5e', pointRadius:12, pointStyle:'triangle' },
+                    { label: 'Projeção Euclidiana', data: [{x:0.88,y:0.83}], backgroundColor:'#f4a261', pointRadius:10, pointStyle:'rectRot' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label.includes('relevantes') ? `Relevância: ${ctx.raw.x}` : ctx.dataset.label } } }, scales: { x: { min: -0.1, max: 1.1 }, y: { min: -0.1, max: 1.1 } } }
+        });
+    }
+
+    let activeTimer = null, timerSeconds = 300;
+    function resetTimer() { if(activeTimer) clearInterval(activeTimer); timerSeconds=300; document.getElementById('timerProgress').style.width='0%'; document.getElementById('timerText').innerHTML='⏳ 300s restantes'; }
+    function startDefenseTimer() { resetTimer(); activeTimer = setInterval(() => { if(timerSeconds<=0) { clearInterval(activeTimer); document.getElementById('timerText').innerHTML='⏰ TIMEOUT (degraded mode)'; document.getElementById('timerProgress').style.width='100%'; } else { timerSeconds--; document.getElementById('timerProgress').style.width=`${((300-timerSeconds)/300)*100}%`; document.getElementById('timerText').innerHTML=`⏳ ${timerSeconds}s restantes`; } }, 1000); }
+    function stopTimer() { if(activeTimer) clearInterval(activeTimer); }
+    function updateFlowStatus(msg) { document.getElementById('flowStatus').innerHTML = `🔵 ${msg}`; }
+    function updateHashChain(newHash) { document.getElementById('hashChainPreview').innerHTML = `prev_hash: ${newHash.substring(0,24)}...`; }
+    function updateOpaStatus(allowed, token) { document.getElementById('opaStatus').innerHTML = allowed ? `✅ allow=true + binding_token: ${token.substring(0,20)}...` : `❌ deny + degraded_mode`; }
+    function showModal(title, content) { const modal = document.getElementById('resultModal'); document.getElementById('modalTitle').innerText = title; document.getElementById('modalContent').innerText = content; modal.style.display = 'flex'; }
+    window.closeModal = () => document.getElementById('resultModal').style.display = 'none';
+    function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    async function simulateGovernance() {
+        const log = document.getElementById('govLog');
+        log.innerHTML = '⏳ SEK: gerando run_id...\n';
+        updateFlowStatus('SEK: run_id + trace_id (W3C)');
+        await delay(500);
+        const runId = `run_${Date.now()}_${Math.random().toString(36).substr(2,6)}`;
+        log.innerHTML += `🔹 run_id = ${runId}\n`;
+        updateFlowStatus('A07: AI Governance Classifier → maturidade 3/5');
+        await delay(700);
+        log.innerHTML += `🔹 A07: maturidade detectada = 3\n`;
+        updateFlowStatus('A08: MIG Auditor → relevance vectors (512d) → pgvector');
+        await delay(800);
+        log.innerHTML += `🔹 MIG: vetores salvos (TTL 90 dias)\n`;
+        updateFlowStatus('OPA Gatekeeper: MSB-21 #2, #5');
+        await delay(700);
+        const token = `eyJhbGc.${Math.random().toString(36).substr(2,10)}`;
+        log.innerHTML += `✅ OPA: {allow: true, binding_token}\n`;
+        updateOpaStatus(true, token);
+        updateFlowStatus('Commit: audit_trails com prev_hash SHA256');
+        const newHash = `sha256:${Math.random().toString(36).substr(2,32)}`;
+        updateHashChain(newHash);
+        await delay(500);
+        log.innerHTML += `🔒 audit_trails: cadeia estendida\n✅ Diagnóstico concluído`;
+        showModal("Diagnóstico MSB-21", JSON.stringify({ run_id: runId, maturity:3, opa_decision: { allow: true, binding_token: token }, audit_hash: newHash }, null, 2));
+    }
+
+    async function simulateDefense() {
+        const log = document.getElementById('legalLog');
+        log.innerHTML = '⚔️ Defense Orchestrator iniciado (≤300s)\n';
+        startDefenseTimer();
+        updateFlowStatus('D01: Adversarial Analyzer');
+        await delay(700);
+        const runId = `def_${Date.now()}_${Math.random().toString(36).substr(2,6)}`;
+        log.innerHTML += `🔹 D01: PL 2338 aplicável | run_id=${runId}\n`;
+        updateFlowStatus('D02: MSB-21 Gap Finder');
+        await delay(800);
+        log.innerHTML += `🔹 D02: gap #2 (AIBOM) confiança 0.94\n`;
+        updateFlowStatus('D03: MIG Evidence Generator');
+        await delay(900);
+        log.innerHTML += `🔹 D03: vetores protegidos relevância <0.03\n`;
+        updateFlowStatus('D04: Regressive Rego Compiler');
+        await delay(700);
+        log.innerHTML += `✅ D04: política .rego compilada\n📦 ZIP forense gerado\n`;
+        updateFlowStatus('Pipeline finalizado');
+        stopTimer();
+        document.getElementById('timerProgress').style.width = '100%';
+        showModal("Defesa Adversarial", JSON.stringify({ run_id: runId, detected_gaps: [{control:"MSB-21 #2", confidence:0.94}], forensic_zip: `https://api.fellowgovernance.com/forensic/${runId}.zip` }, null, 2));
+    }
+
+    document.getElementById('btnGovernance').addEventListener('click', simulateGovernance);
+    document.getElementById('btnLegal').addEventListener('click', simulateDefense);
+    window.addEventListener('load', () => { initMIGChart(); mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#1b6b5e' } }); mermaid.contentLoaded(); updateHashChain('a3f2e8c9b1d4f7a2e5c8b3a1d9f4e2c7'); });
+</script>
+</body>
+</html>
