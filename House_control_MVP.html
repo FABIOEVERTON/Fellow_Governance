@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FellowHouse - Lista Compartilhada</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .share-badge {
+            background: #ffd700;
+            color: #333;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 320px;
+            background: white;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .tarefas .card-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .add-form input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 1rem;
+            font-size: 1rem;
+        }
+
+        .add-form button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .add-form button:hover {
+            transform: scale(1.05);
+        }
+
+        .items-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .item {
+            background: #f8f9fa;
+            margin: 0.5rem 0;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .item.completed {
+            opacity: 0.6;
+            background: #e9ecef;
+        }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .item-text {
+            font-size: 1rem;
+        }
+
+        .completed .item-text {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #dc3545;
+            padding: 0 0.5rem;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: #e9ecef;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .online-status {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            background: rgba(255,255,255,0.9);
+            display: inline-block;
+            width: auto;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: white;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🏠 FellowHouse</h1>
+        <p>Lista de Compras e Tarefas Compartilhada</p>
+        <div class="share-badge">
+            🌐 Sincronizado em tempo real - Todos veem as mesmas listas!
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <!-- LISTA DE COMPRAS -->
+        <div class="card compras">
+            <div class="card-header">
+                <h2>🛒 Compras</h2>
+            </div>
+            <div class="card-body">
+                <div class="add-form">
+                    <input type="text" id="novaCompra" placeholder="Ex: Pão de forma, Leite, Ovos..." autocomplete="off">
+                    <button onclick="adicionarItem('compras')">+ Adicionar</button>
+                </div>
+                <div id="comprasList" class="items-list">
+                    <div style="text-align:center; padding:2rem;">Carregando...</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="removerConcluidos('compras')">✓ Remover comprados</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTA DE TAREFAS -->
+        <div class="card tarefas">
+            <div class="card-header">
+                <h2>✅ Tarefas</h2>
+            </div>
+            <div class="card-body">
+                <div class="add-form">
+                    <input type="text" id="novaTarefa" placeholder="Ex: Lavar louça, Estudar..." autocomplete="off">
+                    <button onclick="adicionarItem('tarefas')">+ Adicionar</button>
+                </div>
+                <div id="tarefasList" class="items-list">
+                    <div style="text-align:center; padding:2rem;">Carregando...</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="removerConcluidos('tarefas')">✓ Remover concluídas</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+        <div class="online-status" id="statusMsg">🟢 Conectado ao Firebase</div>
+    </div>
+    <footer>
+        💾 Sincronização automática • Qualquer alteração aparece para todos em tempo real
+    </footer>
+</div>
+
+<script>
+    // 🔥 SUAS CONFIGURAÇÕES DO FIREBASE (JÁ COLEI PARA VOCÊ!) 🔥
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFIaIOE-q1sZC_RmU22tvErOwecaUy6CI",
+        authDomain: "fellowhouse-b16fd.firebaseapp.com",
+        databaseURL: "https://fellowhouse-b16fd-default-rtdb.firebaseio.com",
+        projectId: "fellowhouse-b16fd",
+        storageBucket: "fellowhouse-b16fd.firebasestorage.app",
+        messagingSenderId: "1001733734331",
+        appId: "1:1001733734331:web:ce3d8fb7003616c1f78e9e"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Referências no banco de dados
+    const comprasRef = database.ref('compras');
+    const tarefasRef = database.ref('tarefas');
+
+    // Função para adicionar item
+    window.adicionarItem = function(tipo) {
+        const input = tipo === 'compras' ? document.getElementById('novaCompra') : document.getElementById('novaTarefa');
+        const nome = input.value.trim();
+        
+        if (nome === "") {
+            alert("Digite um item!");
+            return;
+        }
+        
+        const newItemRef = tipo === 'compras' ? comprasRef.push() : tarefasRef.push();
+        newItemRef.set({
+            nome: nome,
+            concluido: false,
+            criadoEm: Date.now()
+        });
+        
+        input.value = "";
+        input.focus();
+    }
+
+    // Função para alternar concluído
+    window.toggleItem = function(tipo, id, concluidoAtual) {
+        const itemRef = tipo === 'compras' ? comprasRef.child(id) : tarefasRef.child(id);
+        itemRef.update({
+            concluido: !concluidoAtual
+        });
+    }
+
+    // Função para remover item
+    window.removerItem = function(tipo, id) {
+        if (confirm("Remover este item?")) {
+            const itemRef = tipo === 'compras' ? comprasRef.child(id) : tarefasRef.child(id);
+            itemRef.remove();
+        }
+    }
+
+    // Remover todos os concluídos
+    window.removerConcluidos = function(tipo) {
+        const ref = tipo === 'compras' ? comprasRef : tarefasRef;
+        ref.once('value', (snapshot) => {
+            const dados = snapshot.val();
+            if (dados) {
+                Object.entries(dados).forEach(([id, item]) => {
+                    if (item.concluido) {
+                        ref.child(id).remove();
+                    }
+                });
+            }
+        });
+    }
+
+    // Renderizar lista de compras
+    function renderizarCompras(dados) {
+        const container = document.getElementById('comprasList');
+        
+        if (!dados) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem;">✨ Nenhum item ainda</div>';
+            return;
+        }
+        
+        const itens = Object.entries(dados).map(([id, item]) => ({ id, ...item }));
+        itens.sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
+        
+        container.innerHTML = '';
+        itens.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `item ${item.concluido ? 'completed' : ''}`;
+            div.innerHTML = `
+                <div class="item-content" onclick="toggleItem('compras', '${item.id}', ${item.concluido})">
+                    <input type="checkbox" ${item.concluido ? 'checked' : ''} onclick="event.stopPropagation(); toggleItem('compras', '${item.id}', ${item.concluido})">
+                    <span class="item-text">${escapeHtml(item.nome)}</span>
+                </div>
+                <button class="delete-btn" onclick="removerItem('compras', '${item.id}')">✕</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Renderizar lista de tarefas
+    function renderizarTarefas(dados) {
+        const container = document.getElementById('tarefasList');
+        
+        if (!dados) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem;">✨ Nenhuma tarefa ainda</div>';
+            return;
+        }
+        
+        const itens = Object.entries(dados).map(([id, item]) => ({ id, ...item }));
+        itens.sort((a, b) => (a.criadoEm || 0) - (b.criadoEm || 0));
+        
+        container.innerHTML = '';
+        itens.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `item ${item.concluido ? 'completed' : ''}`;
+            div.innerHTML = `
+                <div class="item-content" onclick="toggleItem('tarefas', '${item.id}', ${item.concluido})">
+                    <input type="checkbox" ${item.concluido ? 'checked' : ''} onclick="event.stopPropagation(); toggleItem('tarefas', '${item.id}', ${item.concluido})">
+                    <span class="item-text">${escapeHtml(item.nome)}</span>
+                </div>
+                <button class="delete-btn" onclick="removerItem('tarefas', '${item.id}')">✕</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Escapar HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Listeners em tempo real do Firebase
+    comprasRef.on('value', (snapshot) => {
+        renderizarCompras(snapshot.val());
+        document.getElementById('statusMsg').innerHTML = '🟢 Sincronizado • ' + new Date().toLocaleTimeString();
+    });
+
+    tarefasRef.on('value', (snapshot) => {
+        renderizarTarefas(snapshot.val());
+    });
+
+    // Permitir Enter nos inputs
+    document.getElementById('novaCompra').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') adicionarItem('compras');
+    });
+    document.getElementById('novaTarefa').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') adicionarItem('tarefas');
+    });
+
+    // Mostrar status de conexão
+    database.ref('.info/connected').on('value', (snap) => {
+        if (snap.val() === true) {
+            document.getElementById('statusMsg').style.background = '#d4edda';
+            document.getElementById('statusMsg').style.color = '#155724';
+        } else {
+            document.getElementById('statusMsg').style.background = '#f8d7da';
+            document.getElementById('statusMsg').style.color = '#721c24';
+            document.getElementById('statusMsg').innerHTML = '🔴 Desconectado - Verifique sua internet';
+        }
+    });
+</script>
+</body>
+</html>
