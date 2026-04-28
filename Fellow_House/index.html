@@ -2,71 +2,116 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>FellowHouse - Lista Compartilhada</title>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <!-- PWA Manifest for installable app on Android/iPhone -->
+    <link rel="manifest" href="data:application/manifest+json,{
+        %22name%22:%22FellowHouse%22,
+        %22short_name%22:%22FellowHouse%22,
+        %22start_url%22:%22.%22,
+        %22display%22:%22standalone%22,
+        %22theme_color%22:%23667eea%22,
+        %22background_color%22:%23667eea%22,
+        %22icons%22:[
+            {%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23667eea'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white'%3E🏠%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22%7D
+        ]
+    }">
+    
+    <!-- Apple Touch Icon for iOS home screen -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23667eea'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white'%3E🏠%3C/text%3E%3C/svg%3E">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FellowHouse">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
     
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', sans-serif;
+            font-family: system-ui, 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 2rem 1rem;
+            padding: 1rem;
+            /* Melhor ajuste para celular */
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             color: white;
+            padding: 0 0.5rem;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.95;
         }
 
         .share-badge {
             background: #ffd700;
             color: #333;
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 1rem;
             border-radius: 2rem;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .dashboard {
             display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Para tablets, lado a lado */
+        @media (min-width: 768px) {
+            .dashboard {
+                flex-direction: row;
+                gap: 1.5rem;
+            }
+            .card {
+                flex: 1;
+            }
+            body {
+                padding: 2rem;
+            }
         }
 
         .card {
-            flex: 1;
-            min-width: 320px;
             background: white;
             border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
         }
 
         .card-header {
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            padding: 1.5rem;
+            padding: 1.2rem 1.5rem;
             color: white;
         }
 
@@ -76,50 +121,67 @@
         }
 
         .card-header h2 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .card-body {
-            padding: 1.5rem;
+            padding: 1.2rem;
         }
 
         .add-form {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
 
         .add-form input {
             flex: 1;
-            padding: 0.8rem;
-            border: 2px solid #e0e0e0;
+            padding: 0.9rem 1rem;
+            border: 2px solid #e9ecef;
             border-radius: 1rem;
             font-size: 1rem;
+            background: #fefefe;
+            transition: border 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .add-form input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .add-form button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 0 1.5rem;
+            padding: 0 1.2rem;
             border-radius: 1rem;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            white-space: nowrap;
+            touch-action: manipulation;
+            min-height: 48px; /* Acessível para toque */
         }
 
-        .add-form button:hover {
-            transform: scale(1.05);
+        .add-form button:active {
+            transform: scale(0.96);
         }
 
         .items-list {
-            max-height: 450px;
+            max-height: 400px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .item {
             background: #f8f9fa;
-            margin: 0.5rem 0;
+            margin: 0.6rem 0;
             padding: 0.8rem 1rem;
             border-radius: 1rem;
             display: flex;
@@ -127,29 +189,46 @@
             align-items: center;
             border-left: 4px solid #667eea;
             transition: all 0.2s;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
+            touch-action: manipulation;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
+            from { opacity: 0; transform: translateX(-8px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
         .item.completed {
-            opacity: 0.6;
+            opacity: 0.65;
             background: #e9ecef;
+            border-left-color: #adb5bd;
         }
 
         .item-content {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.9rem;
             flex: 1;
             cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .item-content input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #667eea;
+            margin: 0;
+            flex-shrink: 0;
+            /* Melhor área de toque */
+            transform: scale(1);
         }
 
         .item-text {
             font-size: 1rem;
+            word-break: break-word;
+            flex: 1;
+            line-height: 1.4;
         }
 
         .completed .item-text {
@@ -158,56 +237,119 @@
         }
 
         .delete-btn {
-            background: none;
+            background: rgba(220, 53, 69, 0.1);
             border: none;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             cursor: pointer;
             color: #dc3545;
-            padding: 0 0.5rem;
-            transition: 0.2s;
+            padding: 0.5rem 0.7rem;
+            border-radius: 2rem;
+            transition: all 0.2s;
+            font-weight: bold;
+            touch-action: manipulation;
+            min-width: 48px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .delete-btn:hover {
-            transform: scale(1.2);
+        .delete-btn:active {
+            background: #dc3545;
+            color: white;
+            transform: scale(0.92);
         }
 
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
         }
 
         .btn-secondary {
             flex: 1;
             background: #e9ecef;
             border: none;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            padding: 0.8rem 0.5rem;
+            border-radius: 1rem;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.2s;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+            touch-action: manipulation;
+            min-height: 48px;
         }
 
-        .btn-secondary:hover {
-            background: #dee2e6;
+        .btn-secondary:active {
+            background: #ced4da;
+            transform: scale(0.97);
         }
 
         .online-status {
             text-align: center;
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            padding: 0.5rem;
+            margin-top: 1.2rem;
+            font-size: 0.8rem;
+            padding: 0.6rem 1rem;
             border-radius: 2rem;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.92);
             display: inline-block;
             width: auto;
+            backdrop-filter: blur(4px);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         footer {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 1.8rem;
             color: white;
-            opacity: 0.9;
+            opacity: 0.85;
+            font-size: 0.75rem;
+        }
+        
+        /* Ajustes para iPhone com notch e botões de segurança */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            body {
+                padding-bottom: env(safe-area-inset-bottom, 1rem);
+            }
+            .card-body {
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+            }
+        }
+        
+        /* Rolagem suave no iOS */
+        .items-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .items-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .items-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        /* Estilo para botão remover concluídos ativo */
+        .btn-secondary:active {
+            background: #b0b6bd;
+        }
+        
+        /* Melhora a legibilidade */
+        .item-text {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Feedback visual ao tocar no checkbox */
+        .item-content:active {
+            background: rgba(0,0,0,0.03);
+            border-radius: 1rem;
+        }
+        
+        .status-container {
+            text-align: center;
         }
     </style>
 </head>
@@ -215,9 +357,9 @@
 <div class="container">
     <div class="header">
         <h1>🏠 FellowHouse</h1>
-        <p>Lista de Compras e Tarefas Compartilhada</p>
+        <p>Lista de Compras e Tarefas em Tempo Real</p>
         <div class="share-badge">
-            🌐 Sincronizado em tempo real - Todos veem as mesmas listas!
+            🌐 Sincronizado instantâneo • Compartilhado com todos
         </div>
     </div>
 
@@ -229,11 +371,11 @@
             </div>
             <div class="card-body">
                 <div class="add-form">
-                    <input type="text" id="novaCompra" placeholder="Ex: Pão de forma, Leite, Ovos..." autocomplete="off">
-                    <button onclick="adicionarItem('compras')">+ Adicionar</button>
+                    <input type="text" id="novaCompra" placeholder="Ex: Leite, Pão, Frutas..." autocomplete="off" enterkeyhint="done">
+                    <button onclick="adicionarItem('compras')">+</button>
                 </div>
                 <div id="comprasList" class="items-list">
-                    <div style="text-align:center; padding:2rem;">Carregando...</div>
+                    <div style="text-align:center; padding:2rem; color:#888;">Carregando...</div>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-secondary" onclick="removerConcluidos('compras')">✓ Remover comprados</button>
@@ -248,11 +390,11 @@
             </div>
             <div class="card-body">
                 <div class="add-form">
-                    <input type="text" id="novaTarefa" placeholder="Ex: Lavar louça, Estudar..." autocomplete="off">
-                    <button onclick="adicionarItem('tarefas')">+ Adicionar</button>
+                    <input type="text" id="novaTarefa" placeholder="Ex: Limpar casa, Estudar..." autocomplete="off" enterkeyhint="done">
+                    <button onclick="adicionarItem('tarefas')">+</button>
                 </div>
                 <div id="tarefasList" class="items-list">
-                    <div style="text-align:center; padding:2rem;">Carregando...</div>
+                    <div style="text-align:center; padding:2rem; color:#888;">Carregando...</div>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-secondary" onclick="removerConcluidos('tarefas')">✓ Remover concluídas</button>
@@ -261,16 +403,17 @@
         </div>
     </div>
     
-    <div style="text-align: center; margin-top: 1rem;">
+    <div class="status-container">
         <div class="online-status" id="statusMsg">🟢 Conectado ao Firebase</div>
     </div>
     <footer>
-        💾 Sincronização automática • Qualquer alteração aparece para todos em tempo real
+        📲 Instale este app: ⋮ (Android) ou Compartilhar → Adicionar à Tela de Início (iOS)<br>
+        💾 Sincronização automática • Todos veem as mudanças em tempo real
     </footer>
 </div>
 
 <script>
-    // 🔥 SUAS CONFIGURAÇÕES DO FIREBASE (JÁ COLEI PARA VOCÊ!) 🔥
+    // 🔥 CONFIGURAÇÕES DO FIREBASE (JÁ INCLUÍDAS) 🔥
     const firebaseConfig = {
         apiKey: "AIzaSyBFIaIOE-q1sZC_RmU22tvErOwecaUy6CI",
         authDomain: "fellowhouse-b16fd.firebaseapp.com",
@@ -289,13 +432,18 @@
     const comprasRef = database.ref('compras');
     const tarefasRef = database.ref('tarefas');
 
-    // Função para adicionar item
+    // Função para adicionar item (com validação)
     window.adicionarItem = function(tipo) {
         const input = tipo === 'compras' ? document.getElementById('novaCompra') : document.getElementById('novaTarefa');
         const nome = input.value.trim();
         
         if (nome === "") {
-            alert("Digite um item!");
+            // Pequeno feedback tátil
+            input.style.borderColor = "#dc3545";
+            setTimeout(() => { input.style.borderColor = "#e9ecef"; }, 800);
+            // Vibração sutil se suportado (opcional)
+            if (navigator.vibrate) navigator.vibrate(50);
+            alert("Digite um item antes de adicionar!");
             return;
         }
         
@@ -308,6 +456,8 @@
         
         input.value = "";
         input.focus();
+        // feedback visual pequeno
+        if (navigator.vibrate) navigator.vibrate(20);
     }
 
     // Função para alternar concluído
@@ -316,37 +466,51 @@
         itemRef.update({
             concluido: !concluidoAtual
         });
+        if (navigator.vibrate) navigator.vibrate(10);
     }
 
     // Função para remover item
     window.removerItem = function(tipo, id) {
-        if (confirm("Remover este item?")) {
+        if (confirm("Remover este item permanentemente?")) {
             const itemRef = tipo === 'compras' ? comprasRef.child(id) : tarefasRef.child(id);
             itemRef.remove();
+            if (navigator.vibrate) navigator.vibrate(30);
         }
     }
 
     // Remover todos os concluídos
     window.removerConcluidos = function(tipo) {
         const ref = tipo === 'compras' ? comprasRef : tarefasRef;
-        ref.once('value', (snapshot) => {
-            const dados = snapshot.val();
-            if (dados) {
-                Object.entries(dados).forEach(([id, item]) => {
-                    if (item.concluido) {
-                        ref.child(id).remove();
+        const tipoDisplay = tipo === 'compras' ? "itens comprados" : "tarefas concluídas";
+        if (confirm(`Remover TODOS os ${tipoDisplay}?`)) {
+            ref.once('value', (snapshot) => {
+                const dados = snapshot.val();
+                if (dados) {
+                    let removidos = 0;
+                    Object.entries(dados).forEach(([id, item]) => {
+                        if (item.concluido) {
+                            ref.child(id).remove();
+                            removidos++;
+                        }
+                    });
+                    if (removidos === 0) {
+                        alert(`Nenhum ${tipo === 'compras' ? 'item comprado' : 'tarefa concluída'} para remover.`);
+                    } else {
+                        if (navigator.vibrate) navigator.vibrate(50);
                     }
-                });
-            }
-        });
+                } else {
+                    alert("Lista vazia.");
+                }
+            });
+        }
     }
 
-    // Renderizar lista de compras
+    // Renderizar lista de compras com melhorias touch
     function renderizarCompras(dados) {
         const container = document.getElementById('comprasList');
         
         if (!dados) {
-            container.innerHTML = '<div style="text-align:center; padding:2rem;">✨ Nenhum item ainda</div>';
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:#6c757d;">✨ Nenhum item na lista</div>';
             return;
         }
         
@@ -357,23 +521,55 @@
         itens.forEach(item => {
             const div = document.createElement('div');
             div.className = `item ${item.concluido ? 'completed' : ''}`;
+            // Eventos inline para máxima compatibilidade mobile
             div.innerHTML = `
-                <div class="item-content" onclick="toggleItem('compras', '${item.id}', ${item.concluido})">
-                    <input type="checkbox" ${item.concluido ? 'checked' : ''} onclick="event.stopPropagation(); toggleItem('compras', '${item.id}', ${item.concluido})">
+                <div class="item-content" data-id="${item.id}" data-tipo="compras" data-concluido="${item.concluido}">
+                    <input type="checkbox" ${item.concluido ? 'checked' : ''} data-id="${item.id}" data-tipo="compras" data-concluido="${item.concluido}">
                     <span class="item-text">${escapeHtml(item.nome)}</span>
                 </div>
-                <button class="delete-btn" onclick="removerItem('compras', '${item.id}')">✕</button>
+                <button class="delete-btn" data-id="${item.id}" data-tipo="compras">✕</button>
             `;
             container.appendChild(div);
         });
+        
+        // Adicionar event listeners para evitar conflitos com onclick e melhor performance
+        document.querySelectorAll('#comprasList .item-content').forEach(el => {
+            const newEl = el.cloneNode(true);
+            el.parentNode.replaceChild(newEl, el);
+            const checkbox = newEl.querySelector('input[type="checkbox"]');
+            const id = newEl.getAttribute('data-id');
+            const concluido = newEl.getAttribute('data-concluido') === 'true';
+            newEl.addEventListener('click', (e) => {
+                // Se clicou diretamente no checkbox não disparar duas vezes
+                if (e.target.tagName !== 'INPUT') {
+                    toggleItem('compras', id, concluido);
+                }
+            });
+            if (checkbox) {
+                checkbox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleItem('compras', id, concluido);
+                });
+            }
+        });
+        
+        document.querySelectorAll('#comprasList .delete-btn').forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            const id = newBtn.getAttribute('data-id');
+            newBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removerItem('compras', id);
+            });
+        });
     }
 
-    // Renderizar lista de tarefas
+    // Renderizar lista de tarefas (mesma abordagem)
     function renderizarTarefas(dados) {
         const container = document.getElementById('tarefasList');
         
         if (!dados) {
-            container.innerHTML = '<div style="text-align:center; padding:2rem;">✨ Nenhuma tarefa ainda</div>';
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:#6c757d;">✨ Nenhuma tarefa cadastrada</div>';
             return;
         }
         
@@ -385,52 +581,154 @@
             const div = document.createElement('div');
             div.className = `item ${item.concluido ? 'completed' : ''}`;
             div.innerHTML = `
-                <div class="item-content" onclick="toggleItem('tarefas', '${item.id}', ${item.concluido})">
-                    <input type="checkbox" ${item.concluido ? 'checked' : ''} onclick="event.stopPropagation(); toggleItem('tarefas', '${item.id}', ${item.concluido})">
+                <div class="item-content" data-id="${item.id}" data-tipo="tarefas" data-concluido="${item.concluido}">
+                    <input type="checkbox" ${item.concluido ? 'checked' : ''} data-id="${item.id}" data-tipo="tarefas">
                     <span class="item-text">${escapeHtml(item.nome)}</span>
                 </div>
-                <button class="delete-btn" onclick="removerItem('tarefas', '${item.id}')">✕</button>
+                <button class="delete-btn" data-id="${item.id}" data-tipo="tarefas">✕</button>
             `;
             container.appendChild(div);
         });
+        
+        // Anexar eventos específicos
+        document.querySelectorAll('#tarefasList .item-content').forEach(el => {
+            const newEl = el.cloneNode(true);
+            el.parentNode.replaceChild(newEl, el);
+            const id = newEl.getAttribute('data-id');
+            const concluido = newEl.getAttribute('data-concluido') === 'true';
+            newEl.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    toggleItem('tarefas', id, concluido);
+                }
+            });
+            const cb = newEl.querySelector('input[type="checkbox"]');
+            if (cb) {
+                cb.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleItem('tarefas', id, concluido);
+                });
+            }
+        });
+        
+        document.querySelectorAll('#tarefasList .delete-btn').forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            const id = newBtn.getAttribute('data-id');
+            newBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removerItem('tarefas', id);
+            });
+        });
     }
 
-    // Escapar HTML
+    // Escapar HTML para segurança
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-    // Listeners em tempo real do Firebase
+    // Listeners em tempo real Firebase (otimizado)
     comprasRef.on('value', (snapshot) => {
         renderizarCompras(snapshot.val());
-        document.getElementById('statusMsg').innerHTML = '🟢 Sincronizado • ' + new Date().toLocaleTimeString();
+        atualizarStatusMsg();
     });
 
     tarefasRef.on('value', (snapshot) => {
         renderizarTarefas(snapshot.val());
+        atualizarStatusMsg();
+    });
+    
+    function atualizarStatusMsg() {
+        const el = document.getElementById('statusMsg');
+        if (el && !el.innerHTML.includes('Desconectado')) {
+            el.innerHTML = '🟢 Sincronizado • ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        }
+    }
+
+    // Permitir Enter nos inputs com melhor tratamento mobile
+    const compraInput = document.getElementById('novaCompra');
+    const tarefaInput = document.getElementById('novaTarefa');
+    
+    if (compraInput) {
+        compraInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                adicionarItem('compras');
+            }
+        });
+    }
+    
+    if (tarefaInput) {
+        tarefaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                adicionarItem('tarefas');
+            }
+        });
+    }
+    
+    // Remover o foco do teclado após submit para boa experiência
+    document.querySelectorAll('.add-form button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTimeout(() => {
+                if (document.activeElement && document.activeElement.blur) {
+                    document.activeElement.blur();
+                }
+            }, 50);
+        });
     });
 
-    // Permitir Enter nos inputs
-    document.getElementById('novaCompra').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') adicionarItem('compras');
-    });
-    document.getElementById('novaTarefa').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') adicionarItem('tarefas');
-    });
-
-    // Mostrar status de conexão
+    // Mostrar status de conexão em tempo real
     database.ref('.info/connected').on('value', (snap) => {
+        const statusDiv = document.getElementById('statusMsg');
         if (snap.val() === true) {
-            document.getElementById('statusMsg').style.background = '#d4edda';
-            document.getElementById('statusMsg').style.color = '#155724';
+            statusDiv.style.background = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.innerHTML = '🟢 Conectado • Sincronizando';
+            setTimeout(() => {
+                if (statusDiv.innerHTML.includes('Conectado')) {
+                    statusDiv.innerHTML = '🟢 Sincronizado • ' + new Date().toLocaleTimeString();
+                }
+            }, 500);
         } else {
-            document.getElementById('statusMsg').style.background = '#f8d7da';
-            document.getElementById('statusMsg').style.color = '#721c24';
-            document.getElementById('statusMsg').innerHTML = '🔴 Desconectado - Verifique sua internet';
+            statusDiv.style.background = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.innerHTML = '🔴 Desconectado - Verifique sua internet. As alterações serão sincronizadas quando voltar.';
         }
     });
+    
+    // Prevenir zoom em inputs (apenas para melhor usabilidade, mas mantém acessível)
+    const allInputs = document.querySelectorAll('input');
+    allInputs.forEach(input => {
+        input.addEventListener('touchstart', function() {
+            this.style.fontSize = '16px';
+        });
+    });
+    
+    // Dicas de instalação para iOS/Android via console amigável (opcional)
+    console.log("✅ FellowHouse pronto para instalação! No iPhone: Compartilhar -> Adicionar à Tela de Início. No Android: Menu -> Instalar aplicativo.");
+    
+    // Garantir que todos os botões tenham área de toque suficiente e exibição completa
+    const ensureTouchFriendly = () => {
+        const allButtons = document.querySelectorAll('button, .btn-secondary, .delete-btn');
+        allButtons.forEach(btn => {
+            if (!btn.style.minHeight) btn.style.minHeight = '48px';
+            if (!btn.style.touchAction) btn.style.touchAction = 'manipulation';
+        });
+    };
+    setTimeout(ensureTouchFriendly, 100);
+    
+    // Ajuste para evitar que o layout quebre com telas muito pequenas (ex: iPhone SE)
+    const adjustForSmallScreens = () => {
+        if (window.innerWidth < 380) {
+            document.querySelectorAll('.card-header h2').forEach(h2 => {
+                h2.style.fontSize = '1.3rem';
+            });
+        }
+    };
+    window.addEventListener('resize', adjustForSmallScreens);
+    adjustForSmallScreens();
 </script>
 </body>
 </html>
